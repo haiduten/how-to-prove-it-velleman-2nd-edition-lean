@@ -1,0 +1,5 @@
+{
+  "workbench.colorTheme": "Default Dark+",
+  "editor.semanticHighlighting.enabled": true,
+  "lean4.infoview.showExpectedType": false
+}

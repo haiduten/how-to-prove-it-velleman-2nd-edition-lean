@@ -36,6 +36,46 @@ theorem Exercise_3_7_1 (U : Type) (F: Set (Set U)) :
     done
   done
 
+theorem Exercise_3_7_2 :
+  ∃! (m : ℝ), 0 < m ∧ (∀ (x : ℝ),
+    0 < x → (x / (x + 1) < m)) ∧ (∀ (y: ℝ), 0 < y → (∀ (z: ℝ), 0 < z → z / (z + 1) < y) → m ≤ y) := by
+  exists_unique
+  · -- existence
+    apply Exists.intro 1
+    apply And.intro zero_lt_one
+    apply And.intro
+    · -- prove ∀ x > 0, x / (x + 1) < 1
+      fix x
+      assume positiveX
+      have xPlusOne := lt_add_one x
+      have XPlusOnePos := lt_trans positiveX xPlusOne
+      have xPlusOne := (div_lt_div_iff_of_pos_right XPlusOnePos).mpr xPlusOne
+      rw[div_self (ne_of_gt XPlusOnePos)] at xPlusOne
+      exact xPlusOne
+    · -- prove 1 ≤ y
+      fix y
+      assume yPos
+      assume ZCondition
+      by_contra yLt1
+      have yLt1 := not_le.mp yLt1
+      rw[←(add_zero y)] at yLt1
+      have OneMinusYPos := lt_sub_iff_add_lt'.mpr yLt1
+      have OneMinusYNotZero := (ne_of_lt OneMinusYPos).symm
+      have ZCondition := ZCondition (y / (1 - y)) (div_pos yPos OneMinusYPos)
+      field_simp[OneMinusYNotZero] at ZCondition;
+      simp at ZCondition
+      done
+    done
+  · -- uniqueness
+    fix Y; fix Z
+    assume h1
+    assume h2
+    have h3 := h1.right.right Z h2.left h2.right.left
+    have h4 := h2.right.right Y h1.left h1.right.left
+    show Y = Z from eq_of_ge_of_le h4 h3
+    done
+  done
+
 theorem Like_Exercise_3_7_5 (U : Type) (F : Set (Set U))
     (h1 : 𝒫 (⋃₀ F) ⊆ ⋃₀ {𝒫 A | A ∈ F}) :
     ∃ (A : Set U), A ∈ F ∧ ∀ (B : Set U), B ∈ F → B ⊆ A := by

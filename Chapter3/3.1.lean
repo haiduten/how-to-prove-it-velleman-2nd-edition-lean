@@ -112,3 +112,47 @@ theorem Exercise_3_1_10 (a b : ℝ) : a < b → (a + b) / 2 < b := by
   rw[simpLeft, simpRight] at final
   show (a + b) / 2 < b from final
   done
+
+theorem Exercise_3_1_11 (x : ℝ) (h1: x ≠ 0):
+  (x^(1/3) + 5) / (x^(2) + 6) = 1 / x → x ≠ 8 := by
+  contrapos
+  assume xIs8
+  by_contra long_equation
+  rw[xIs8] at long_equation
+  norm_num at long_equation
+  done
+
+theorem Exercise_3_1_12 (a b c d: ℝ) (h1: 0 < a) (h2: a < b) (h3: d > 0):
+  (a * c ≥ b * d) → c > d := by
+  assume longEquivalence
+  have longEquivalence := longEquivalence.le
+  have aDBDEquivalence := (mul_lt_mul_iff_of_pos_right h3).mpr h2
+  have aDACEquivalence : a * d < a * c :=
+    calc a * d
+     _  < b * d := aDBDEquivalence
+     _  ≤ a * c := longEquivalence
+  have oneOverAPos: 1 / a > 0 := one_div_pos.mpr h1
+  have final := (mul_lt_mul_iff_of_pos_right oneOverAPos).mpr aDACEquivalence
+  field_simp at final
+  show c > d from final.gt
+  done
+
+theorem Exercise_3_1_13 (x y: ℝ) (h1: 3 * x + 2 * y ≤ 5):
+  x > 1 → y < 1 := by
+  assume xGtOne
+  #check lt_add_of_sub_right_lt
+  have h2: 3 * x  ≤ 5 - 2 * y := le_tsub_of_add_le_right h1
+  have h3 :=  (mul_lt_mul_iff_of_pos_left (by norm_num: (0: ℝ) < 3)).mpr xGtOne
+  have h4: 3 * 1 < 5 - 2 * y :=
+    calc 3 * 1
+      _ < 3 * x := h3
+      _ ≤ 5 - 2 * y := h2
+  have h4 := add_lt_of_lt_sub_right h4
+  rw [add_comm (3 * 1) (2 * y)] at h4
+  have h4 := lt_sub_iff_add_lt.mpr h4
+  have h4 :=  (mul_lt_mul_iff_of_pos_left (by norm_num: (0: ℝ) < (1/2))).mpr h4
+  have simpLeft:  1 / 2 * (2 * y) = y := by ring
+  have simpRight: (1: ℝ) / 2 * (5 - 3 * 1) = 1 := by ring
+  rw[simpLeft, simpRight] at h4
+  show y < 1 from h4
+  done

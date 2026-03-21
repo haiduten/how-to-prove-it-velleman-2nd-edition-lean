@@ -140,7 +140,6 @@ theorem Exercise_3_1_12 (a b c d: ℝ) (h1: 0 < a) (h2: a < b) (h3: d > 0):
 theorem Exercise_3_1_13 (x y: ℝ) (h1: 3 * x + 2 * y ≤ 5):
   x > 1 → y < 1 := by
   assume xGtOne
-  #check lt_add_of_sub_right_lt
   have h2: 3 * x  ≤ 5 - 2 * y := le_tsub_of_add_le_right h1
   have h3 :=  (mul_lt_mul_iff_of_pos_left (by norm_num: (0: ℝ) < 3)).mpr xGtOne
   have h4: 3 * 1 < 5 - 2 * y :=
@@ -156,3 +155,68 @@ theorem Exercise_3_1_13 (x y: ℝ) (h1: 3 * x + 2 * y ≤ 5):
   rw[simpLeft, simpRight] at h4
   show y < 1 from h4
   done
+
+theorem Exercise_3_1_14
+  (x y: ℝ) (h1: x^2 + y = -3) (h2: 2 * x - y = 2) : x = -1 := by
+  have long_equation : -3 + 2 = x^2 + y + 2 * x - y :=
+    calc -3 + (2 : ℝ)
+      _ = -3 + (2 * x - y) := by rw[h2]
+      _ = x^2 + y + (2 * x - y ) := by rw[h1]
+      _ = x^2 + y + 2 * x - y := by ring
+  have simpLeft : x^2 + y + 2 * x - y = x^2 + 2 * x := by ring
+  rw[simpLeft] at long_equation
+  have simpRight : -3 + (2: ℝ)  = -1 := by ring
+  rw[simpRight] at long_equation
+  have h3 : x = -1 := by
+    nlinarith [long_equation]
+  show x = -1 from h3
+  done
+
+theorem Exercise_3_1_15 (x y: ℝ) (h1: x > 3) (h2: y < 2):
+  x ^ 2 - 2 * y > 5:= by
+  have xIsPos: 0 < x := lt_trans (by norm_num: (0: ℝ) < 3) h1.lt
+  have xSquaredTerm: x * 3 < x * x := (mul_lt_mul_iff_of_pos_left xIsPos).mpr h1
+  have threeXTerm := (mul_lt_mul_iff_of_pos_right (by norm_num: (0: ℝ) < 3)).mpr h1
+  have xSquaredTerm := lt_trans threeXTerm xSquaredTerm
+  have xSquaredTerm := (sub_lt_sub_iff_right 4).mpr xSquaredTerm
+  have twoYTerm := (mul_lt_mul_iff_of_pos_left (by norm_num: (0: ℝ) < 2)).mpr h2
+  have twoYTerm := neg_lt_neg_iff.mpr twoYTerm
+  have twoYTerm := (add_lt_add_iff_left (x * x)).mpr twoYTerm
+  have xSquaredSimp: x * x + -(2 * y) = x ^ 2 - 2 * y := by ring
+  rw[xSquaredSimp] at twoYTerm
+  show  x ^ 2 - 2 * y > 5 from
+    calc x ^ 2 - 2 * y
+      _ > x * x + -(2 * 2) := twoYTerm
+      _  = x * x - 4 := by ring
+      _  > 3 * 3 - 4 := xSquaredTerm
+      _ = 5 := by ring
+  done
+
+/-
+  3.1.16 (a)
+  The reasoning is circular. You assumed the conclusion to prove the conclusion to true
+-/
+
+theorem Exercise_3_1_16_b (x: ℝ) (h1: x ≠ 4):
+  ((2 * x - 5) / (x - 4) = 3) → x = 7 := by
+  assume h2
+  have h0 : (x - 4) ≠ 0 := by
+    by_contra contra
+    have h3 := sub_eq_zero.mp contra
+    show False from h1 h3
+  apply_fun (fun y => (x - 4) * y) at h2
+  have simpLeft: (x - 4) * ((2 * x - 5) / (x - 4)) = 2 * x - 5 := by field_simp
+  have simpRight: (x - 4) * 3 = 3 * x - 12 := by field
+  rw[simpLeft, simpRight] at h2
+  apply_fun (fun y => y - 2 * x + 12) at h2
+  have simpLeft: 2 * x - 5 - 2 * x + 12 = 7 := by ring
+  have simpRight: 3 * x - 12 - 2 * x + 12 = x := by ring
+  rw[simpLeft, simpRight] at h2
+  show x = 7 from h2.symm
+  done
+
+/-
+  3.1.17
+  (a) x^2 ≠ 9 is false even if x ≠ 3. Suppose x = -3
+  (b) x = -3, y = 1. -3^2 * 1 = 9 = 9 * 1 
+-/

@@ -1,7 +1,6 @@
 import HTPILib.Chap3
 namespace HTPI.Exercises
 
-
 theorem Exercise_3_2_1a (P Q R : Prop)
     (h1 : P → Q) (h2 : Q → R) : P → R := by
   assume h3: P
@@ -93,6 +92,53 @@ theorem Exercise_3_2_8 (x y: ℝ) (h1: y + x = 2 * y - x)
   done
 
 theorem Exercise_3_2_9 (a b: ℝ) (h1: a ≠ 0) (h2: b ≠ 0):
-  (a < 1 / a) ∧ (1 / a < b) ∧ (b < 1 / b) → a < -1 := by
-
+  a < 1 / a →  1 / a < b → b < 1 / b → a < -1 := by
+  assume h3; assume h4; assume h5
+  have aSquaredPos: a * a ≥ 0 := mul_self_nonneg a
+  by_contra contra
+  have contra := not_lt.mp contra
+  by_cases ha: (0 ≤ a)
+  · -- a is pos
+    have ha := lt_or_eq_of_le ha
+    disj_syll ha h1.symm
+    have h6 := (mul_lt_mul_of_pos_left h3 ha)
+    rw[(by field_simp:  a * (1 / a) = 1 )] at h6
+    have h6 := Real.sqrt_lt_sqrt (mul_self_nonneg a) h6
+    rw[(by norm_num: √1 = 1),Real.sqrt_mul_self (le_of_lt ha)] at h6
+    have h7: (1: ℝ) < 1 /a := one_lt_one_div ha h6
+    have bPos := lt_trans (by norm_num: (0: ℝ) < 1) (lt_trans h7 h4)
+    have h8 := (mul_lt_mul_of_pos_left h5 bPos)
+    rw[(by field: b * (1 / b) = 1)] at h8
+    have h8 := Real.sqrt_lt_sqrt (mul_self_nonneg b) h8
+    rw[(by norm_num: √1 = 1),Real.sqrt_mul_self (le_of_lt bPos)] at h8
+    have d := lt_irrefl 1 (lt_trans (lt_trans h7 h4) h8)
+    show False from d
+    done
+  · -- a is neg
+    have ha: a < 0 := lt_of_not_ge ha
+    have h6 := (mul_lt_mul_of_neg_left h3 ha)
+    have simpLeft: a * (1 / a) = 1 := by field_simp
+    rw[simpLeft] at h6
+    have h6 := Real.sqrt_lt_sqrt (by norm_num: (0: ℝ) ≤ 1) h6
+    have simpLeft: √1 = 1 := by norm_num
+    rw[simpLeft, Real.sqrt_mul_self_eq_abs] at h6
+    have h6 := lt_abs.mp h6
+    have h7: 1 ≥ a :=
+      calc 1
+      _ ≥ (0: ℝ) := by norm_num
+      _ ≥ a := nonpos_of_mul_nonneg_right aSquaredPos ha
+    have h7 := not_lt.mpr h7.le
+    disj_syll h6 h7
+    have h6 := (mul_lt_mul_of_neg_left h6 (by norm_num: (-1: ℝ) < 0))
+    rw[(by norm_num : -1 * -a = a), (by norm_num : (-1: ℝ) * 1 = -1)] at h6
+    have h7: (-1: ℝ) < a ∨ -1 = a := lt_or_eq_of_le contra
+    by_cases on h7
+    · -- -1 < a
+      show False from lt_irrefl a (lt_trans h6 h7)
+      done
+    · -- -1 = a
+      rw[h7.symm] at h6
+      show False from lt_irrefl (-1: ℝ) h6
+      done
+    done
   done

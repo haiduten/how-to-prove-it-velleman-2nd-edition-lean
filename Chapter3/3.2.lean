@@ -142,3 +142,47 @@ theorem Exercise_3_2_9 (a b: ℝ) (h1: a ≠ 0) (h2: b ≠ 0):
       done
     done
   done
+
+theorem Exercise_3_2_10 (x y: ℝ): x^2 * y = 2 * x + 7 → y ≠ 0 → x ≠ 0 := by
+  assume h1
+  assume h2
+  by_contra h3
+  rw[h3, (by norm_num:  0 ^ 2 * y  = 0), (by norm_num: (2: ℝ) * 0 + 7 = 7)] at h1
+  have final: (0: ℝ) ≠ 0 :=
+    calc 0
+    _ = 7 := h1
+    _ ≠ 0 := by norm_num
+  show False from final (by norm_num: (0: ℝ) = 0)
+  done
+
+theorem Exercise_3_2_11 (x y: ℝ):
+  x ≠ 0 → y = (3 * x^2 + 2 * y) / (x^2 + 2) → y = 3 := by
+  assume h1
+  assume h2
+  apply_fun (fun z => ((z * (x^2 + 2)) - 2 * y) / x^2) at h2
+  have simpLeft: (y * (x ^ 2 + 2) - 2 * y) / x ^ 2 = y := by field
+  have simpRight: ((3 * x ^ 2 + 2 * y) / (x ^ 2 + 2) * (x ^ 2 + 2) - 2 * y) / x ^ 2 = 3 := by field
+  rw[simpLeft, simpRight] at h2
+  show y = 3 from h2
+
+/-
+Exercise 3.2.12
+(a) Incorrect application of negation. Assume the conclusion to be false is x = 3 or y = 8
+(b) x = 2 and y = 8
+-/
+
+/-
+Exercise 3.2.13
+(a) B ⊆ C means ∀ x ∈ B → x ∈ C. Since x ∉ B, we cannot conclude anything about
+whether its part of C.
+(b) Let A = set of even natural numbers. Let B = set of odd natural numbers. Let C = set of natural numbers
+-/
+
+/-
+Skipping truth table problems from Exercise 3.2.14 to Exercise 3.2.17...
+-/
+
+/-
+Exercise 3.2.18
+No. If we assume y = 4. Then x^2 = 9. And x could be -3 and there's no contradiction
+-/

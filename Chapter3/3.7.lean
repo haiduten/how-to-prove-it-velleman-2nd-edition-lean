@@ -76,7 +76,61 @@ theorem Exercise_3_7_2 :
     done
   done
 
-theorem Like_Exercise_3_7_5 (U : Type) (F : Set (Set U))
+theorem Exercise_3_7_3 (U: Type) (A B: Set U):
+  𝒫 (A \ B) \ (𝒫 A \ 𝒫 B) = {∅} := by
+  apply Set.ext
+  fix x
+  apply Iff.intro
+  · -- →
+    assume h1
+    define at h1
+    have h2 := h1.left; have h3 := h1.right
+    define at h2
+    define at h3; demorgan at h3
+    have xInPowerSetA: x ∈ 𝒫 A := by
+      by_contra contra; define at contra; quant_neg at contra
+      obtain (u: U) hu from contra
+      conditional at hu
+      have uInA := h2 hu.left
+      define at uInA
+      show False from hu.right uInA.left
+      done
+    disj_syll h3 xInPowerSetA
+    define at h3
+    by_contra contra
+    define at contra
+    have contra := Set.nonempty_iff_ne_empty.mpr contra
+    define at contra
+    obtain (a : U) ha from contra
+    have h2 := h2 ha; define at h2
+    have h3 := h3 ha
+    show False from h2.right h3
+    done
+  · -- ←
+    assume h1
+    define at h1
+    define
+    apply And.intro
+    · -- x ∈ 𝒫 (A \ B)
+      fix y
+      contrapos
+      assume h2
+      rw[h1]
+      exact Set.notMem_empty y
+      done
+    · -- x ∉ 𝒫 A \ 𝒫 B
+      rw[h1]
+      define; demorgan
+      or_right with h5
+      fix y
+      contrapos
+      assume ignore
+      exact Set.notMem_empty y
+      done
+    done
+  done
+
+theorem Exercise_3_7_5 (U : Type) (F : Set (Set U))
     (h1 : 𝒫 (⋃₀ F) ⊆ ⋃₀ {𝒫 A | A ∈ F}) :
     ∃ (A : Set U), A ∈ F ∧ ∀ (B : Set U), B ∈ F → B ⊆ A := by
   define at h1;

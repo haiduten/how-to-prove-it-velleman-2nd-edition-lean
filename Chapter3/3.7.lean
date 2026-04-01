@@ -130,6 +130,107 @@ theorem Exercise_3_7_3 (U: Type) (A B: Set U):
     done
   done
 
+theorem Exercise_3_7_4 (U: Type) (A B C: Set U): ((A ∆ C) ∩ (B ∆ C) = ∅ ↔ A ∩ B ⊆ C ∧ C ⊆ A ∪ B) ∧ ((A ∆ C) ∩ (B ∆ C) = ∅ ↔ A ∆ C ⊆ A ∆ B) := by
+  have h: (A ∆ C) ∩ (B ∆ C) = ∅ ↔ A ∩ B ⊆ C ∧ C ⊆ A ∪ B := by
+    rw[Set.eq_empty_iff_forall_notMem]
+    simp
+    constructor
+    · -- prove (∀ x ∈ A ∆ C, x ∉ B ∆ C) → A ∩ B ⊆ C ∧ C ⊆ A ∪ B
+      rintro h
+      constructor
+      · -- prove A ∩ B ⊆ C
+        rintro x hx
+        by_contra h'
+        have h₁: x ∈ A ∆ C := by
+          rw[Set.symmDiff_def]
+          left
+          rw[Set.mem_diff]
+          constructor; exact hx.1; exact h'
+        have h := h x h₁
+        apply h
+        rw[Set.symmDiff_def]
+        left
+        constructor; exact hx.2; exact h'
+      · --  C ⊆ A ∪ B
+        intro x hx
+        by_cases ha: x ∈ A
+        left; exact ha
+        have hh: x ∈ A ∆ C := by
+          right; constructor; exact hx; exact ha
+        have h := h x hh
+        by_contra h'
+        apply h
+        right; constructor; exact hx
+        by_contra h''
+        apply h'; right; exact h''
+    · -- A ∩ B ⊆ C ∧ C ⊆ A ∪ B → ∀ x ∈ A ∆ C, x ∉ B ∆ C
+      rintro ⟨h, h1⟩ x hx
+      rw[Set.symmDiff_def, Set.mem_union, Set.mem_diff, Set.mem_diff]; demorgan
+      constructor
+      demorgan
+      rcases hx with hx | hx
+      left
+      by_contra h'
+      apply hx.2
+      simp[Set.subset_def] at h
+      exact h x hx.1 h'
+      apply Or.inr hx.1
+      demorgan
+      rcases hx with hx | hx
+      apply Or.inl hx.2
+      right
+      have h1:= h1 hx.1
+      rcases h1 with h1 | h1
+      have ⟨g, k⟩:= hx
+      contradiction
+      exact h1
+  have h₁: A ∩ B ⊆ C ∧ C ⊆ A ∪ B ↔ A ∆ C ⊆ A ∆ B := by
+    constructor
+    rintro ⟨h₁, h₂⟩ x hx
+    rcases hx with ⟨hx1, hx2⟩ | ⟨hx1, hx2⟩
+    left
+    constructor; exact hx1
+    by_contra h'
+    apply hx2
+    simp[Set.subset_def] at h₁
+    exact h₁ x hx1 h'
+    right
+    constructor
+    rcases h₂ hx1 with g | g
+    contradiction; exact g; exact hx2
+    rintro h₀
+    constructor
+    rintro x ⟨hA, hB⟩
+    by_cases h': x ∈ C
+    exact h'
+    have hAC: x ∈ A ∆ C := by
+      left
+      apply (Set.mem_diff x).mpr
+      constructor
+      exact hA
+      exact h'
+    rcases h₀ hAC with ⟨_, hNb⟩ | ⟨_, hNA⟩
+    contradiction
+    contradiction
+    rintro x hx
+    by_cases h': x ∈ A
+    apply Or.inl h'
+    right
+    have hAC: x ∈ A ∆ C := by
+      right
+      constructor
+      exact hx
+      exact h'
+    rcases h₀ hAC with ⟨ha, _⟩ | ⟨b, _⟩
+    contradiction
+    exact b
+    done
+  constructor
+  apply h
+  rw[h]
+  apply h₁
+
+
 theorem Exercise_3_7_5 (U : Type) (F : Set (Set U))
     (h1 : 𝒫 (⋃₀ F) ⊆ ⋃₀ {𝒫 A | A ∈ F}) :
     ∃ (A : Set U), A ∈ F ∧ ∀ (B : Set U), B ∈ F → B ⊆ A := by

@@ -115,4 +115,121 @@ theorem Example_4_2_5_5: inv (comp S R) = comp (inv R) (inv S) := by
     rw[inv]; simp;
     use u
 
+/-
+  Exercise 4_2_1_a
+  Domain: (mom, dad, ...)
+  Range: (viktor, april)
+
+  Exercise 4_2_1_b
+  Domain: (-1, 0, 1, ...)
+  Range: (1, 2, 3, ....)
+
+  Exercise 4_2_2_a
+  Domain: (yonko, krum)
+  range: (maria, rali)
+
+  Exercise 4_2_2_b
+  Domain: (0, 1, 2, ....)
+  Range: (0, 0.5...)
+
+  Exercise 4_2_3_a
+  The pair of students who live in same dorm
+
+  Exercise 4_2_3_b
+  Pair of student and college course in which
+  the college course has students in the
+  same dorm of the student
+
+  Exercise 4_2_4_a
+  pair of student and day where student is enrolled
+  in a course that meets that day
+
+  Exercise 4_2_4_b
+  pair of professor and day where the professor
+  teaches a course that meets that day
+
+  Exercise 4_2_5_a
+  {(1, 4), (1, 5), (1, 6), (2 , 4), (3, 6)}
+
+  Exercise 4_2_5_b
+  {(5, 5), (5, 6), (6, 5), (6, 6), (4, 4)}
+
+  Exercise 4_2_6_a
+  {(1, 4), (3, 5), (3, 4)}
+
+  Exercise 4_2_6_b
+  {(4, 1), (4, 3), (5, 3)}
+-/
+
+theorem Exercise_4_2_7_a: Dom (inv R) = Ran R := by
+  apply Set.ext
+  intro y
+  constructor
+  · -- mp
+    rintro h; rw[Dom] at h;
+    rcases h with ⟨x, hx⟩
+    rw[inv] at hx; simp at hx
+    rw[Ran]; use x
+  · --
+    rintro h;
+    rcases h with ⟨x, hx⟩
+    rw[Dom]
+    use x
+    rw[inv]; simp
+    exact hx
+
+theorem Exercise_4_2_7_b: Ran (inv R) = Dom R := by
+  rw [← Example_4_2_5_2]
+  rw [Example_4_2_5_1]
+
+theorem Exercise_4_2_7_c: comp T (comp S R) = comp (comp T S) R := by
+  apply Set.ext
+  rintro ⟨p, q⟩
+  constructor
+  · -- mp
+    rintro ⟨r, ⟨h₁, h₂⟩⟩
+    rcases h₁ with ⟨u , ⟨h₃, h4⟩⟩
+    use u;
+    apply And.intro h₃
+    use r
+  · -- mpr
+    rintro ⟨r, ⟨h₁, h₂⟩⟩
+    rcases h₂ with ⟨u , ⟨h₃, h4⟩⟩
+    use u; symm
+    apply And.intro h4
+    use r
+
+theorem Exercise_4_2_7_d: inv (comp S R) = comp (inv R) (inv S) := by
+  apply Set.ext
+  rintro ⟨m, n⟩
+  constructor
+  · -- mp
+    rintro h
+    rw[inv] at h; simp at h
+    rcases h with ⟨u, h₁, h₂⟩
+    use u
+    apply And.intro h₂ h₁
+  · -- mpr
+    rintro h
+    rcases h with ⟨u, h₁, h₂⟩
+    rw[inv] at h₁; simp at h₁
+    rw[inv] at h₂; simp at h₂
+    rw[inv]; simp;
+    use u
+
+/-
+  Exercise_4_2_8
+  (a , b) ∈ E ∘ E = a is the enemy of b's enemy
+  (a , b) ∈ F = a is b's friend
+
+  E ∘ E ⊆ F
+-/
+
+theorem Exercise_4_2_9_a: Dom (comp S R) ⊆ Dom R:= by
+  rintro m h
+  rcases h with ⟨n, h₁⟩
+  rcases h₁ with ⟨o, h₂, h₂⟩
+  use o
+
+
 end

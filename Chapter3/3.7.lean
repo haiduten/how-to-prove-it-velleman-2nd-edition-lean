@@ -130,7 +130,10 @@ theorem Exercise_3_7_3 (U: Type) (A B: Set U):
     done
   done
 
-theorem Exercise_3_7_4 (U: Type) (A B C: Set U): ((A ∆ C) ∩ (B ∆ C) = ∅ ↔ A ∩ B ⊆ C ∧ C ⊆ A ∪ B) ∧ ((A ∆ C) ∩ (B ∆ C) = ∅ ↔ A ∆ C ⊆ A ∆ B) := by
+theorem Exercise_3_7_4 (U: Type) (A B C: Set U):
+((A ∆ C) ∩ (B ∆ C) = ∅ ↔ A ∩ B ⊆ C ∧ C ⊆ A ∪ B) ∧
+(( A ∩ B ⊆ C ∧ C ⊆ A ∪ B) ↔ A ∆ C ⊆ A ∆ B) ∧
+((A ∆ C) ∩ (B ∆ C) = ∅ ↔ A ∆ C ⊆ A ∆ B) := by
   have h: (A ∆ C) ∩ (B ∆ C) = ∅ ↔ A ∩ B ⊆ C ∧ C ⊆ A ∪ B := by
     rw[Set.eq_empty_iff_forall_notMem]
     simp
@@ -227,8 +230,10 @@ theorem Exercise_3_7_4 (U: Type) (A B C: Set U): ((A ∆ C) ∩ (B ∆ C) = ∅ 
     done
   constructor
   apply h
-  rw[h]
+  constructor
   apply h₁
+  rw[←h₁]
+  apply h
 
 
 theorem Exercise_3_7_5 (U : Type) (F : Set (Set U))
@@ -251,3 +256,60 @@ theorem Exercise_3_7_5 (U : Type) (F : Set (Set U))
   have h6: B ⊆ ⋃₀ F := Set.subset_sUnion_of_mem hB
   show B ⊆ G from Set.Subset.trans h6 h4
   done
+
+
+section
+variable {U : Type*}
+variable (F: Set (Set U))
+variable (A : U → Set U)
+
+theorem Exercise_3_7_6_a: ⋃ i ∈ ⋃₀ F, A i = ⋃ X ∈ F, ⋃ i ∈ X, A i := by
+  apply Set.ext
+  intro x
+  constructor
+  repeat
+  intro h
+  simp at h
+  rcases h with ⟨i, hi, j, k, l⟩
+  simp
+  use i, hi, j
+
+theorem Exercise_3_7_6_b: ⋂ i ∈ ⋃₀ F, A i = ⋂ X ∈ F, ⋂ i ∈ X, A i := by
+  apply Set.ext
+  intro x
+  constructor
+  repeat
+  intro h
+  simp at h
+  simp
+  rintro i hi j hj
+  exact h i hi j hj
+
+theorem Exercise_3_7_6_c: ⋃ i ∈ ⋂₀ F, A i ⊆ ⋂ X ∈ F, ⋃ i ∈ X, A i := by
+  intro x
+  rintro h
+  simp at h
+  rcases h with ⟨i, hi, hAi⟩
+  simp
+  rintro t ht
+  use i, (hi t ht)
+
+/-
+  Counter Example. F = {{1, 2}, {1, 4}}. A i = the divisors of i
+  so ⋃ i ∈ ⋂₀ F, A i = {1}. ⋂ X ∈ F, ⋃ i ∈ X, A i = {1, 2}
+-/
+
+theorem Exercise_3_7_6_d: ⋃ X ∈ F, ⋂ i ∈ X, A i ⊆ ⋂ i ∈ ⋂₀ F, A i := by
+  intro x
+  rintro h; simp at h
+  simp
+  intro y hy
+  rcases h with ⟨u, hu, hu2⟩
+  exact hu2 y (hy u hu)
+  done
+
+/-
+  Exercise_3_7_10:
+  This is correct
+-/
+end

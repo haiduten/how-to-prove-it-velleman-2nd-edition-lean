@@ -231,5 +231,218 @@ theorem Exercise_4_2_9_a: Dom (comp S R) ⊆ Dom R:= by
   rcases h₁ with ⟨o, h₂, h₂⟩
   use o
 
+theorem Exercise_4_2_9_b (h: Ran R ⊆ Dom S): Dom (comp S R) = Dom R := by
+  apply Set.ext
+  intro m
+  constructor
+  · -- mp
+    rintro h
+    rcases h with ⟨n, ⟨o, ho1, ho2⟩⟩
+    use o
+  · -- mpr
+    rintro h₁
+    rcases h₁ with ⟨n, hn⟩
+    rcases h (Exists.intro m hn) with ⟨o, ho⟩
+    use o;
+    use n
+
+theorem Exercise_4_2_9_c: Ran (comp S R) ⊆ Ran S := by
+  intro m
+  rintro h
+  rcases h with ⟨n, ⟨o, ho1, ho2⟩⟩
+  use o
 
 end
+
+section
+
+variable {U : Type}
+variable (A B: (Set U))
+variable (R: Set (A × B))
+variable (S: Set (A × B))
+
+theorem Exercise_4_2_10_a: R ⊆ (Dom R) ×ˢ (Ran R):= by
+  rintro ⟨a, b⟩  h
+  constructor
+  use b
+  use a
+
+theorem Exercise_4_2_10_b (h: R ⊆ S): inv R ⊆ inv S := by
+  rintro ⟨a, b⟩ h₁
+  define at h₁
+  define
+  exact h h₁
+
+theorem Exercise_4_2_10_c: inv (R ∪ S) = inv R ∪ (inv S):= by
+  apply Set.ext
+  rintro ⟨a, b⟩
+  constructor
+  · -- mp
+    rintro h; define at h
+    rcases h with h | h
+    apply Or.inl h
+    apply Or.inr h
+  · -- mpr
+    rintro (h | h)
+    apply Or.inl h
+    apply Or.inr h
+end
+
+theorem Exercise_4_2_11 (U : Type) (A B C: Set U) (R: Set (A × B)) (S: Set (B × C)):
+  comp S R = ∅ ↔ Ran R ∩ (Dom S) = ∅:= by
+  contrapose
+  push_neg
+  constructor
+  · -- mp
+    rintro ⟨⟨m, n⟩, ⟨o, h₁, h₂⟩⟩
+    use o
+    constructor
+    use m
+    use n
+  · -- mpr
+    rintro ⟨m, ⟨⟨n, h₁⟩, ⟨o, h₂⟩⟩⟩
+    use (n, o);
+    use m
+
+section
+variable {U : Type}
+variable (A B C: (Set U))
+variable (R: Set (A × B))
+variable (S: Set (B × C))
+variable (T: Set (B × C))
+
+theorem Exercise_4_2_12_a: (comp S R) \ (comp T R) ⊆ comp (S \ T) R:= by
+  rintro ⟨m, n⟩ ⟨⟨o, h₁, h₂⟩, h₃⟩
+  use o
+  apply And.intro h₁ (And.intro h₂ _)
+  by_contra h'
+  apply h₃
+  use o
+
+/-
+Exercise_4_2_12_b
+You cannot conlude (a, c) ∉ T ∘ R. In order to do that we must show that
+there is no element in B such that (a, b) ∈ R and (b, c) ∈ T. So far we
+just showed it for one element. We must prove it for all
+-/
+
+/-
+Exercise_4_2_12_c
+Let R = {(1, 1), (1, 7)}
+Let S = {(1, 3)}
+Let T = {(7, 3)}
+-/
+
+section
+variable {U : Type}
+variable (A B C:  (Set U))
+variable (R: Set (A × B))
+variable (S: Set (A × B))
+variable (T: Set (B × C))
+
+theorem Exercise_4_2_13_a: (R ∩ S = ∅) → (inv R) ∩ (inv S) = ∅ := by
+  contrapose
+  push_neg
+  rintro ⟨⟨m, n⟩, h₁, h₂⟩
+  define at h₁; define at h₂
+  use (n, m)
+  apply And.intro h₁ h₂
+
+/-
+Exercise_4_2_13_b
+Let R be a pair of natural numbers st (n, n + 1) {(2, 3), (3, 4), ...}
+Let S be a pair of natural numbers st (n, n - 1) {(2, 1), (3, 2), ...}
+Let T be a pair of a natural number and boolean indicating if it is prime
+{(3, true), (4, false), ...}
+
+Exercise_4_2_13_c
+Let R = {(1, 1), (2, 2)}
+Let S = {(2, 2), (3, 3)}
+Let T = {(1, 1), (3, 3)}
+-/
+end
+
+section
+variable {U : Type}
+variable (A B C:  (Set U))
+variable (R: Set (A × B))
+variable (S: Set (B × C))
+variable (T: Set (B × C))
+
+theorem Exercise_4_2_14_a: S ⊆ T → (comp S R) ⊆ comp T  R := by
+  rintro h ⟨m, n⟩ ⟨o, h₁, h₂⟩
+  use o
+  apply And.intro h₁ (h h₂)
+
+theorem Exercise_4_2_14_b: comp (S ∩ T) R ⊆ (comp S R) ∩ (comp T R) := by
+  rintro ⟨m, n⟩ ⟨o, h₁, h₂, h₃⟩
+  constructor
+  repeat
+  use o
+
+/-
+Exercise 4_2_14_c
+S ∘ R ∩ T ∘ R ⊄ (S ∩ T) ∘ R
+Let R = {(1, 1), (1, 2)}
+Let S = {(2, 9)}
+Let T = {(1, 9)}
+-/
+
+theorem Exercise_4_2_14_d: comp (S ∪ T) R = (comp S R) ∪ (comp T R) := by
+  apply Set.ext
+  rintro ⟨m, n⟩
+  constructor
+  · -- mp
+    rintro ⟨u, h₁, h₂ | h₂⟩
+    · -- case 1
+      left
+      use u
+    · -- case 2
+      right
+      use u
+  · -- mpr
+    rintro (⟨u, h₁, h₂⟩ | ⟨u, h₁, h₂⟩)
+    · -- case 1
+      use u;
+      apply And.intro h₁ (Or.inl h₂)
+    · -- case 2
+      use u
+      apply And.intro h₁ (Or.inr h₂)
+end
+
+theorem Exercise_4_2_15 (U: Type) (A B C D: Set U) (R S : Set (U × U)) (h₁: R ⊆ (A ×ˢ B)) (h₂: S ⊆ (C ×ˢ D)):
+  (∃ (E: Set U), R ⊆ (A ×ˢ E) ∧ S ⊆ (E ×ˢ D)) ∧
+  (∀ (E: Set U), ∀ (E': Set U), R ⊆ (A ×ˢ E) ∧ S ⊆ (E ×ˢ D) ∧ R ⊆ (A ×ˢ E') ∧ S ⊆ (E' ×ˢ D) →
+  {(a, c) : U × U | ∃ b ∈ E,  (a, b) ∈ R ∧ (b ,c) ∈ S} = {(a, c) : U × U | ∃ b ∈ E', (a, b) ∈ R ∧ (b ,c) ∈ S}):= by
+  constructor
+  · -- existence
+    use (B ∪ C)
+    constructor
+    · -- prove for R
+      intro ⟨m, n⟩ h
+      constructor
+      exact (h₁ h).left
+      apply Or.inl (h₁ h).right
+    · -- prove for S
+      intro ⟨m, n⟩ h
+      constructor
+      apply Or.inr (h₂ h).left
+      exact (h₂ h).right
+  · -- same composiiton
+    rintro  E E' ⟨h₃, h₄, h₅, h₆⟩
+    apply Set.ext
+    rintro ⟨a, c⟩
+    constructor
+    · -- →
+      rintro ⟨b, h₇, h₈, h₉⟩
+      use b
+      constructor
+      exact (h₅ h₈).right
+      apply And.intro h₈ h₉
+    · -- →
+      rintro ⟨b, h₇, h₈, h₉⟩
+      use b
+      constructor
+      exact (h₃ h₈).right
+      apply And.intro h₈ h₉
+

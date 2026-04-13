@@ -637,7 +637,6 @@ theorem Exercise_4_3_6 (r s: ℝ) (hr: 0 < r) (hs: 0 < s): comp (D r) (D s) = D 
         exact hzz
       have hxy := hxy ((X' ∪ {z}) \ {y}) h₂
       have yyy: ((X' ∪ {z}) \ {y} ∪ {x} ∈ F)  = ((X' ∪ {x}) \ {y} ∪ {z} ∈ F) := by
-        #check Set.diff_singleton_eq_self
         rw[Set.union_diff_distrib, Set.union_diff_distrib]
         have u: {z} \ {y} = {z} := Set.diff_singleton_eq_self yeqz
         rw[u]
@@ -686,6 +685,13 @@ theorem Exercise_4_3_6 (r s: ℝ) (hr: 0 < r) (hs: 0 < s): comp (D r) (D s) = D 
         exact hx'
       exact hX'2
 
+  /-
+  Exercise 4_3_24_a
+  Yes
+
+  Exercise _4_3_24_b
+  No (-1, -1) ∉ R
+  -/
 
 
 

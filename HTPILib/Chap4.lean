@@ -23,11 +23,17 @@ def extension {A B : Type} (R : Rel A B) : Set (A × B) :=
 def reflexive {A : Type} (R : BinRel A) : Prop :=
   ∀ (x : A), R x x
 
+def reflexive_on {A : Type} (B: Set A) (R : BinRel A) : Prop :=
+  ∀ (x : A), x ∈ B → R x x
+
 def symmetric {A : Type} (R : BinRel A) : Prop :=
   ∀ (x y : A), R x y → R y x
 
 def transitive {A : Type} (R : BinRel A) : Prop :=
   ∀ (x y z : A), R x y → R y z → R x z
+
+def transitive_on {A : Type} (B: Set A) (R : BinRel A) : Prop :=
+  ∀ (x y z : A), x ∈ B ∧ y ∈ B ∧ z ∈ B → R x y → R y z → R x z
 
 def elementhood (A : Type) (a : A) (X : Set A) : Prop := a ∈ X
 
@@ -37,11 +43,20 @@ def RelFromExt {A B : Type}
 def antisymmetric {A : Type} (R : BinRel A) : Prop :=
   ∀ (x y : A), R x y → R y x → x = y
 
+def antisymmetric_on {A : Type} (B: Set A) (R : BinRel A) : Prop :=
+  ∀ (x y : A), x ∈ B ∧ y ∈ B → R x y → R y x → x = y
+
 def partial_order {A : Type} (R : BinRel A) : Prop :=
   reflexive R ∧ transitive R ∧ antisymmetric R
 
+def partial_order_on {A : Type} (B: Set A) (R : BinRel A) : Prop :=
+  reflexive_on B R ∧ transitive_on B R ∧ antisymmetric_on B R
+
 def total_order {A : Type} (R : BinRel A) : Prop :=
   partial_order R ∧ ∀ (x y : A), R x y ∨ R y x
+
+def total_order_on {A : Type} (B: Set A) (R : BinRel A) : Prop :=
+  partial_order_on B R ∧ ∀ (x y : A), x ∈ B ∧ y ∈ B → R x y ∨ R y x
 
 def sub (A : Type) (X Y : Set A) : Prop := X ⊆ Y
 

@@ -63,8 +63,14 @@ def sub (A : Type) (X Y : Set A) : Prop := X ⊆ Y
 def smallestElt {A : Type} (R : BinRel A) (b : A) (B : Set A) : Prop :=
   b ∈ B ∧ ∀ x ∈ B, R b x
 
+def largestElt {A : Type} (R : BinRel A) (b : A) (B : Set A) : Prop :=
+  b ∈ B ∧ ∀ x ∈ B, R x b
+
 def minimalElt {A : Type} (R : BinRel A) (b : A) (B : Set A) : Prop :=
   b ∈ B ∧ ¬∃ x ∈ B, R x b ∧ x ≠ b
+
+def maximalElt {A : Type} (R : BinRel A) (b : A) (B : Set A) : Prop :=
+  b ∈ B ∧ ¬∃ x ∈ B, R b x ∧ x ≠ b
 
 def upperBd {A : Type} (R : BinRel A) (a : A) (B : Set A) : Prop :=
   ∀ x ∈ B, R x a

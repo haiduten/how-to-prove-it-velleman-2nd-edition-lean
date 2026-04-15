@@ -888,3 +888,174 @@ theorem Exercise_4_4_9_part {A B : Type} (R : BinRel A) (S : BinRel B)
   exact reflR a'
   rintro _
   exact hS
+
+theorem Exercise_4_4_10 {A: Type} (R: BinRel A) (P: A → Set A)
+  (hR: partial_order R)
+  (hP: ∀ a : A, ∀ b: A,  b ∈ P a ↔ R b a):
+    ∀ (x y : A), R x y ↔ P x ⊆ P y := by
+  rcases hR with ⟨reflR, transR, _⟩
+  rintro x y
+  constructor
+  · -- mp
+    rintro hxy
+    rintro a
+    rw[hP, hP]
+    rintro hax
+    apply transR
+    exact hax
+    exact hxy
+  · -- mpr
+    rintro h
+    define at h
+    simp[hP] at h
+    exact h (reflR x)
+
+/-
+Exercise_4_4_11
+Primes are minimal elements in B. B does not have a smallest element
+-/
+
+theorem Exercise_4_4_12 (R: BinRel (Set ℝ)) (B: Set (Set ℝ)) (hR: ∀ (X Y: Set ℝ), R X Y ↔ X ⊆ Y)
+  (hR': partial_order R)
+  (hB: ∀ (X: Set ℝ), X ∈ B ↔ X ≠ ∅ ∧ (∀ x y : ℝ, (x ∈ X ∧ x < y) → y ∈ X)):
+  ¬(∃ X ∈ B, ¬(∃ Y ∈ B, R Y X ∧ Y ≠ X)) := by
+  push_neg
+  rintro X h
+  rw[hB] at h
+  rcases h with ⟨h, h'⟩
+  rw[←Set.nonempty_iff_ne_empty] at h
+  rcases h with ⟨x, hx⟩
+  let U: Set ℝ := {y : ℝ | x < y}
+  use U
+  constructor
+  rw[hB]
+  constructor
+  rw[←Set.nonempty_iff_ne_empty]
+  use (x + 1)
+  define
+  exact lt_add_one x
+  rintro x' y' ⟨hx', hx'y'⟩
+  define
+  define at hx'
+  apply lt_trans
+  exact hx'
+  exact hx'y'
+  constructor
+  rw[hR]
+  rintro u hu
+  define at hu
+  exact h' x u (And.intro hx hu)
+  by_contra hcontra
+  rw[←hcontra] at hx
+  define at hx
+  rw[lt_self_iff_false] at hx
+  exact hx
+
+ theorem Exercise_4_4_13 (A: Type) (R: BinRel A) (hR: partial_order R):
+      partial_order (RelFromExt (inv (extension R))) := by
+    rcases hR with ⟨refl, trans, antisym⟩
+    constructor
+    rintro x
+    exact refl x
+    constructor
+    rintro x y z hx hy
+    exact trans z y x hy hx
+    rintro x y hxy hyx
+    apply antisym
+    exact hyx
+    exact hxy
+
+theorem Exercise_4_4_13_ext (A: Type) (R: BinRel A) (hR: total_order R):
+      ∀ (x y : A), (RelFromExt (inv (extension R))) x y ∨ (RelFromExt (inv (extension R))) y x  := by
+  rcases hR with ⟨_, total⟩
+  rintro x y
+  rcases total x y with (h | h)
+  right
+  exact h
+  left
+  exact h
+
+theorem Exercise_4_4_14_a (A: Type) (R: BinRel A) (B: Set A) (b: A):
+    largestElt R b B ↔ smallestElt (RelFromExt (inv (extension R))) b B := by
+  constructor
+  · -- mp
+    rintro ⟨hb, hxb⟩
+    constructor
+    exact hb
+    rintro x hx
+    define
+    exact hxb x hx
+  · -- mpr
+    rintro ⟨hb, hbx⟩
+    constructor
+    exact hb
+    rintro x hb
+    exact hbx x hb
+
+theorem Exercise_4_4_14_b (A: Type) (R: BinRel A) (B: Set A) (b: A):
+    maximalElt R b B ↔ minimalElt (RelFromExt (inv (extension R))) b B := by
+  constructor
+  · -- mp
+    rintro ⟨hb, hxb⟩
+    constructor
+    exact hb
+    push_neg
+    push_neg at hxb
+    rintro x hx h'
+    exact hxb x hx h'
+  · -- mpr
+    rintro ⟨hb, hxb⟩
+    constructor
+    exact hb
+    push_neg
+    push_neg at hxb
+    rintro x hx hbx
+    apply hxb
+    exact hx
+    exact hbx
+
+theorem Exercise_4_4_15_a (A: Type) (R₁ R₂: BinRel A) (B: Set A)
+    (b: A) (h: (extension R₁ ⊆ extension R₂)):
+      smallestElt R₁ b B → smallestElt R₂ b B := by
+  rintro ⟨hb, hR₁bx⟩
+  constructor
+  exact hb
+  rintro x hx
+  rw[← ext_def R₂ b x]
+  apply h
+  exact hR₁bx x hx
+
+theorem Exercise_4_4_15_b (A: Type) (R₁ R₂: BinRel A) (B: Set A)
+    (b: A) (h: (extension R₁ ⊆ extension R₂)):
+      minimalElt R₂ b B → minimalElt R₁ b B := by
+  rintro ⟨hb, hR⟩
+  constructor
+  exact hb
+  push_neg
+  push_neg at hR
+  rintro x hx hr1xb
+  apply hR
+  exact hx
+  rw[← ext_def R₂ x]
+  rw[← ext_def R₁ x] at hr1xb
+  apply h
+  exact hr1xb
+
+theorem Exercise_4_4_16 (A: Type) (R: BinRel A) (hR: partial_order R) (B: Set A) (b: A):
+    largestElt R b B → maximalElt R b B ∧ ∀ a: A, maximalElt R a B → a = b := by
+  rcases hR with ⟨_, _, antisym⟩
+  rintro ⟨hb, hxb⟩
+  constructor
+  constructor
+  exact hb
+  by_contra h'
+  rcases h' with ⟨x, hb, ⟨hbx, xneqb⟩⟩
+  apply xneqb
+  apply antisym
+  exact hxb x hb
+  exact hbx
+  rintro a ⟨ha, hax⟩
+  push_neg at hax
+  rw[eq_comm]
+  apply hax b hb (hxb a ha)
+

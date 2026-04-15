@@ -75,8 +75,14 @@ def maximalElt {A : Type} (R : BinRel A) (b : A) (B : Set A) : Prop :=
 def upperBd {A : Type} (R : BinRel A) (a : A) (B : Set A) : Prop :=
   ∀ x ∈ B, R x a
 
+def lowerBd {A : Type} (R : BinRel A) (a : A) (B : Set A) : Prop :=
+  ∀ x ∈ B, R a x
+
 def lub {A : Type} (R : BinRel A) (a : A) (B : Set A) : Prop :=
   smallestElt R a {c : A | upperBd R c B}
+
+def glb {A : Type} (R : BinRel A) (a : A) (B : Set A) : Prop :=
+  largestElt R a {c : A | lowerBd R c B}
 
 def equiv_rel {A : Type} (R : BinRel A) : Prop :=
   reflexive R ∧ symmetric R ∧ transitive R

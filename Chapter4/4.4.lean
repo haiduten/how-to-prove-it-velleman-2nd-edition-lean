@@ -1059,3 +1059,192 @@ theorem Exercise_4_4_16 (A: Type) (R: BinRel A) (hR: partial_order R) (B: Set A)
   rw[eq_comm]
   apply hax b hb (hxb a ha)
 
+/-
+Exercise_4_4_17
+Let A = 𝒫 (ℕ)
+Let B = {X | (X = {3} ∨ 𝒫 ({y | y > 5}) \ ∅}
+{3} is a minimal element because no element in 𝒫 ({y | y > 5}) \ ∅
+is contained in {3}. It is not the smallest element because it not
+a subset of 𝒫 ({y | y > 5}) \ ∅
+-/
+
+theorem Exercise_4_4_18_a (A: Type) (R: BinRel A) (hR: partial_order R) (B₁ B₂: Set A)
+    (hB₁B₂: ∀ x ∈ B₁, ∃ y ∈ B₂, R x y) (hB₂B₁: ∀ y ∈ B₂, ∃ x ∈ B₁, R y x):
+    ∀ x: A, upperBd R x B₁ ↔ upperBd R x B₂ := by
+  rcases hR with ⟨_, trans, _⟩
+  rintro x
+  constructor
+  · -- mp
+    rintro hB₁
+    rintro b₂ hb₂
+    rcases hB₂B₁ b₂ hb₂ with ⟨b₁, ⟨hb₁, h'⟩⟩
+    apply trans
+    exact h'
+    exact hB₁ b₁ hb₁
+  · -- mpr
+    rintro hupperBd
+    rintro b₁ hb₁
+    rcases hB₁B₂ b₁ hb₁ with ⟨b₂, ⟨hb₂, h'⟩⟩
+    apply trans
+    exact h'
+    exact hupperBd b₂ hb₂
+
+theorem Exercise_4_4_18_b (A: Type) (R: BinRel A) (hR: partial_order R) (B₁ B₂: Set A)
+    (hB₁B₂: ∀ x ∈ B₁, ∃ y ∈ B₂, R x y) (hB₂B₁: ∀ y ∈ B₂, ∃ x ∈ B₁, R y x)
+    (hDisjoint: B₁ ∩ B₂ = ∅):
+   (¬∃ x ∈ B₁, maximalElt R x B₁) ∧ ¬∃ x ∈ B₂, maximalElt R x B₂  := by
+  rcases hR with ⟨_, trans, antisym⟩
+  constructor
+  push_neg
+  intro b₁ hb₁
+  define
+  demorgan
+  right
+  rcases hB₁B₂ b₁ hb₁ with ⟨b₂, hb2, hb2'⟩
+  rcases hB₂B₁ b₂ hb2 with ⟨b₃, hb3, hb3'⟩
+  use b₃
+  constructor
+  exact hb3
+  constructor
+  apply trans
+  exact hb2'
+  exact hb3'
+  contradict hDisjoint with h'
+  push_neg
+  rw[←h'] at hb2'
+  use b₃
+  constructor
+  rw[h']
+  exact hb₁
+  rw[antisym b₃ b₂ hb2' hb3']
+  exact hb2
+  push_neg
+  rintro b₂ hb₂
+  define; demorgan
+  right
+  rcases hB₂B₁ b₂ hb₂ with ⟨b₁, hb₁, hb₁'⟩
+  rcases hB₁B₂ b₁ hb₁ with ⟨b₃, hb₃, hb₃'⟩
+  use b₃
+  constructor
+  exact hb₃
+  constructor
+  apply trans
+  exact hb₁'
+  exact hb₃'
+  contradict hDisjoint with h'
+  push_neg
+  use b₃
+  constructor
+  rw[← h'] at hb₁'
+  rw[antisym b₃ b₁ hb₁' hb₃']
+  exact hb₁
+  exact hb₃
+
+/-
+Exercise 4_4_19_a
+(a) once you choose bRx or xRb, x is no longer arbitrary so you cannot generalize for
+all x.
+
+(b) Counterexample:
+A: ℕ
+B: (1, 2, 3)
+R: ≤
+2 is not the smallest element of B or the largest
+-/
+
+theorem Exercise_4_4_20_a (A: Type) (R: BinRel A) (B: Set A) (b: A) (hR: partial_order R):
+    smallestElt R b B → glb R b B := by
+  rintro ⟨hb, hbx⟩
+  constructor
+  exact hbx
+  rintro lb hlb
+  exact hlb b hb
+
+theorem Exercise_4_4_20_b (A: Type) (R: BinRel A) (B: Set A) (b: A) (hR: partial_order R):
+    largestElt R b B → lub R b B := by
+  rintro ⟨hb, hbx⟩
+  constructor
+  exact hbx
+  rintro lb hlb
+  exact hlb b hb
+
+theorem Exercise_4_4_21_a (A: Type) (R: BinRel A) (B U: Set A) (b: A) (hR: partial_order R)
+    (hU: ∀ x : A, x ∈ U ↔ upperBd R x B): ∀ x y: A, x ∈ U ∧ R x y → y ∈ U := by
+  rcases hR with ⟨_, trans, _⟩
+  rintro x y ⟨hx, hxy⟩
+  rw[hU] at hx
+  rw[hU]
+  rintro m hm
+  apply trans
+  exact hx m hm
+  exact hxy
+
+theorem Exercise_4_4_21_b (A: Type) (R: BinRel A) (B U: Set A) (b: A) (hR: partial_order R)
+    (hU: ∀ x : A, x ∈ U ↔ upperBd R x B): ∀ b ∈ B, lowerBd R b U := by
+  intro b hb u hu
+  rw[hU] at hu
+  exact hu b hb
+
+theorem Exercise_4_4_21_c (A: Type) (R: BinRel A) (B U: Set A) (x: A) (hR: partial_order R)
+    (hU: ∀ x : A, x ∈ U ↔ upperBd R x B): glb R x U → lub R x B := by
+  rintro ⟨hglb, hglb'⟩
+  constructor
+  intro b hb
+  apply hglb'
+  rintro u hu
+  rw[hU] at hu
+  exact hu b hb
+  rintro u hu
+  apply hglb
+  rw[hU]
+  exact hu
+
+theorem Exercise_4_4_22 (A: Type) (R: BinRel A) (B₁ B₂: Set A) (x₁ x₂: A) (hR: partial_order R)
+    (hx₁: lub R x₁ B₁) (hx₂: lub R x₂ B₂): B₁ ⊆ B₂ → R x₁ x₂ := by
+  rintro hB₁B₂
+  rcases hx₁ with ⟨_, hx₁⟩
+  rcases hx₂ with ⟨hx₂, _⟩
+  apply hx₁
+  rintro b₁ hb₁
+  exact hx₂ b₁ (hB₁B₂ hb₁)
+
+theorem Exercisse_4_4_23 (A: Type) (F: Set (Set A))
+    (hF: F ≠ ∅): lub (sub A) (⋃₀ F) F ∧ glb (sub A) (⋂₀ F) F := by
+  constructor
+  constructor
+  rintro f hf a ha
+  use f
+  rintro m hm f hf
+  rcases hf with ⟨F', hF', hF''⟩
+  exact hm F' hF' hF''
+  constructor
+  rintro F' hF' a ha
+  exact ha F' hF'
+  rintro lb hlb a ha F' hF'
+  exact hlb F' hF' ha
+
+theorem Exercise_4_4_24_a (A: Type) (R S: BinRel A)
+    (hS: ∀ x y : A, S x y ↔ RelFromExt ((extension R) ∪ (inv (extension R))) x y):
+    symmetric S ∧ extension R ⊆ extension S := by
+  constructor
+  rintro x y hxy
+  rw[hS] at hxy
+  rw[hS]
+  rcases hxy with hxy | hxy
+  exact Or.inr hxy
+  exact Or.inl hxy
+  rintro x hr
+  rw[ext_def, hS]
+  exact Or.inl hr
+
+theorem Exercise_4_4_24_B (A: Type) (R S T: BinRel A) (hR: extension R ⊆ extension T)
+    (hS: ∀ x y : A, S x y ↔ RelFromExt ((extension R) ∪ (inv (extension R))) x y):
+    symmetric T → extension S ⊆ extension T := by
+  rintro symT
+  rintro ⟨m, n⟩ hmn
+  rw[ext_def, hS] at hmn
+  rcases hmn with hmn | hmn
+  exact hR hmn
+  apply symT
+  rw[←ext_def T]
+  exact hR hmn

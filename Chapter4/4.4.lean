@@ -1237,7 +1237,7 @@ theorem Exercise_4_4_24_a (A: Type) (R S: BinRel A)
   rw[ext_def, hS]
   exact Or.inl hr
 
-theorem Exercise_4_4_24_B (A: Type) (R S T: BinRel A) (hR: extension R ⊆ extension T)
+theorem Exercise_4_4_24_b (A: Type) (R S T: BinRel A) (hR: extension R ⊆ extension T)
     (hS: ∀ x y : A, S x y ↔ RelFromExt ((extension R) ∪ (inv (extension R))) x y):
     symmetric T → extension S ⊆ extension T := by
   rintro symT
@@ -1248,3 +1248,351 @@ theorem Exercise_4_4_24_B (A: Type) (R S T: BinRel A) (hR: extension R ⊆ exten
   apply symT
   rw[←ext_def T]
   exact hR hmn
+
+theorem Exercise_4_4_25_a (A: Type) (R: BinRel A) (F: Set (BinRel A))
+    (hF: ∀ T: BinRel A, T ∈ F ↔ extension R ⊆ extension T ∧ transitive T):
+    F ≠ ∅ := by
+  push_neg
+  let U: Set (A × A) := Set.univ
+  use RelFromExt U
+  rw[hF]
+  constructor
+  rintro x hx
+  exact Set.mem_univ x
+  rintro x y z hxy hyz
+  rw[RelFromExt]
+  exact Set.mem_univ (x, z)
+
+theorem Exercise_4_4_25_b (A: Type) (R: BinRel A) (F: Set (Set (A × A)))
+    (hF: ∀ T: Set (A × A), T ∈ F ↔ extension R ⊆  T ∧ transitive (RelFromExt T)):
+    transitive (RelFromExt (⋂₀ F)) ∧ extension R ⊆ ⋂₀ F := by
+  constructor
+  rintro x y z hxy hyz F' hF'
+  rw[hF] at hF'
+  apply hF'.2
+  apply hxy
+  rw[hF]
+  exact hF'
+  apply hyz
+  rw[hF]
+  exact hF'
+  rintro r hr F' hF'
+  rw[hF] at hF'
+  exact hF'.1 hr
+
+theorem Exercise_4_4_25_c (A: Type) (R: BinRel A) (F: Set (Set (A × A)))
+    (hF: ∀ T: Set (A × A), T ∈ F ↔ extension R ⊆  T ∧ transitive (RelFromExt T)):
+    smallestElt (sub (A × A)) (⋂₀ F) F := by
+  constructor
+  rw[hF]
+  exact (Exercise_4_4_25_b A R F hF).symm
+  rintro F' hF' a ha
+  exact ha F' hF'
+
+theorem Exercise_4_4_26_a (A: Type) (S₁ S₂ R₁ R₂: BinRel A) (A₁ A₂: Set (Set (A × A)))
+    (hA₁: ∀ F: Set (A × A), F ∈ A₁ ↔ extension R₁ ⊆ F ∧ symmetric (RelFromExt F))
+    (hA₂: ∀ F: Set (A × A), F ∈ A₂ ↔ extension R₂ ⊆ F ∧ symmetric (RelFromExt F))
+    (hS₁: smallestElt (sub (A × A)) (extension S₁) A₁)
+    (hS₂: smallestElt (sub (A × A)) (extension S₂) A₂)
+    (hR₁R₂: extension R₁ ⊆ extension R₂): extension S₁ ⊆  extension S₂ := by
+  rintro s₁ hs₁
+  rcases hS₁ with ⟨_, hS₁⟩
+  apply hS₁
+  rw[hA₁]
+  rcases hS₂ with ⟨hS₂, hS₂'⟩
+  rw [hA₂] at hS₂
+  constructor
+  exact subset_trans hR₁R₂ hS₂.1
+  exact hS₂.2
+  exact hs₁
+
+theorem Exercise_4_4_26_b (A: Type) (T₁ T₂ R₁ R₂: BinRel A) (A₁ A₂: Set (Set (A × A)))
+    (hA₁: ∀ F: Set (A × A), F ∈ A₁ ↔ extension R₁ ⊆ F ∧ transitive (RelFromExt F))
+    (hA₂: ∀ F: Set (A × A), F ∈ A₂ ↔ extension R₂ ⊆ F ∧ transitive (RelFromExt F))
+    (hS₁: smallestElt (sub (A × A)) (extension T₁) A₁)
+    (hS₂: smallestElt (sub (A × A)) (extension T₂) A₂)
+    (hR₁R₂: extension R₁ ⊆ extension R₂): extension T₁ ⊆  extension T₂ := by
+  rintro s₁ hs₁
+  rcases hS₁ with ⟨_, hS₁⟩
+  apply hS₁
+  rw[hA₁]
+  rcases hS₂ with ⟨hS₂, hS₂'⟩
+  rw [hA₂] at hS₂
+  constructor
+  exact subset_trans hR₁R₂ hS₂.1
+  exact hS₂.2
+  exact hs₁
+
+theorem Exercise_4_4_27_a (A: Type) (S S₁ S₂ R R₁ R₂: BinRel A) (B B₁ B₂: Set (Set (A × A)))
+    (hB: ∀ F: Set (A × A), F ∈ B ↔ extension R ⊆ F ∧ symmetric (RelFromExt F))
+    (hB₁: ∀ F: Set (A × A), F ∈ B₁ ↔ extension R₁ ⊆ F ∧ symmetric (RelFromExt F))
+    (hB₂: ∀ F: Set (A × A), F ∈ B₂ ↔ extension R₂ ⊆ F ∧ symmetric (RelFromExt F))
+    (hS: smallestElt (sub (A × A)) (extension S) B)
+    (hS₁: smallestElt (sub (A × A)) (extension S₁) B₁)
+    (hS₂: smallestElt (sub (A × A)) (extension S₂) B₂)
+    (hR: extension R = (extension R₁ ∪ extension R₂)): extension S₁ ∪ extension S₂ = extension S := by
+  apply Set.ext
+  rintro ⟨m ,n⟩
+  constructor
+  rintro (hmn | hmn)
+  have hR₁R : extension R₁ ⊆ extension R := by
+    rw[hR]
+    exact Set.subset_union_left
+  exact (Exercise_4_4_26_a A S₁ S R₁ R B₁ B hB₁ hB hS₁ hS hR₁R) hmn
+  have hR₂R : extension R₂ ⊆ extension R := by
+    rw[hR]
+    exact Set.subset_union_right
+  exact (Exercise_4_4_26_a A S₂ S R₂ R B₂ B hB₂ hB hS₂ hS hR₂R) hmn
+  rcases hS₁ with ⟨hS₁, hS₁'⟩
+  rcases hS₂ with ⟨hS₂, hS₂'⟩
+  rw[hB₁] at hS₁
+  rw[hB₂] at hS₂
+  rintro hmn
+  rcases hS with ⟨hS, hS'⟩
+  apply hS'
+  rw[hB]
+  constructor
+  rw[hR]
+  rintro r (hr | hr)
+  apply Or.inl (hS₁.1 hr)
+  apply Or.inr (hS₂.1 hr)
+  rintro x y (hxy | hxy)
+  apply Or.inl (hS₁.2 x y hxy)
+  apply Or.inr (hS₂.2 x y hxy)
+  exact hmn
+
+theorem Exercise_4_4_27_b (A: Type) (T T₁ T₂ R R₁ R₂: BinRel A) (B B₁ B₂: Set (Set (A × A)))
+    (hB: ∀ F: Set (A × A), F ∈ B ↔ extension R ⊆ F ∧ transitive (RelFromExt F))
+    (hB₁: ∀ F: Set (A × A), F ∈ B₁ ↔ extension R₁ ⊆ F ∧ transitive (RelFromExt F))
+    (hB₂: ∀ F: Set (A × A), F ∈ B₂ ↔ extension R₂ ⊆ F ∧ transitive (RelFromExt F))
+    (hT: smallestElt (sub (A × A)) (extension T) B)
+    (hT₁: smallestElt (sub (A × A)) (extension T₁) B₁)
+    (hT₂: smallestElt (sub (A × A)) (extension T₂) B₂)
+    (hR: extension R = (extension R₁ ∪ extension R₂)): extension T₁ ∪ extension T₂ ⊆  extension T := by
+  rintro ⟨m ,n⟩
+  rintro (hmn | hmn)
+  have hR₁R : extension R₁ ⊆ extension R := by
+    rw[hR]
+    exact Set.subset_union_left
+  exact (Exercise_4_4_26_b A T₁ T R₁ R B₁ B hB₁ hB hT₁ hT hR₁R) hmn
+  have hR₂R : extension R₂ ⊆ extension R := by
+    rw[hR]
+    exact Set.subset_union_right
+  exact (Exercise_4_4_26_b A T₂ T R₂ R B₂ B hB₂ hB hT₂ hT hR₂R) hmn
+
+/-
+Let T₁/R₁ = {(1, 2)}
+Let T₂/R₂ = {(2, 3)}
+T₁ ∪ T₂ = {(1, 2), (2, 3)}. This is not transitive so it cannot be T
+-/
+
+theorem Exercise_4_4_28_a (A: Type) (B: Set (Set (A × A))) (x y: A) (hxneqy: x ≠ y)
+    (hB: ∀ X: Set (A × A), X ∈ B ↔ antisymmetric (RelFromExt X)):
+    ¬∃ R: Set (A × A), largestElt (sub (A × A)) R B := by
+  push_neg
+  rintro R
+  define; demorgan
+  or_right with hRInB
+  by_contra h'
+  rw[hB] at hRInB
+  have hXYInB: {(x, y)} ∈ B := by
+    rw[hB]
+    rintro p q hpq hqp
+    rw[←hqp] at hpq
+    rw[RelFromExt] at hpq
+    simp at hpq
+    exact hpq.1
+  have hYXInB: {(y, x)} ∈ B := by
+    rw[hB]
+    rintro p q hpq hqp
+    rw[←hqp] at hpq
+    rw[RelFromExt] at hpq
+    simp at hpq
+    exact hpq.1
+  apply hxneqy
+  apply hRInB
+  rw[RelFromExt]
+  apply h' {(x, y)} hXYInB
+  rfl
+  apply h' {(y, x)} hYXInB
+  rfl
+
+theorem Exercise_4_4_28_b (A: Type) (R: BinRel A) (hR: total_order R):
+    ¬∃ S: BinRel A, antisymmetric S ∧ extension R ⊆ extension S ∧ extension R ≠ extension S := by
+  push_neg
+  rintro S hS hRS
+  apply Set.ext
+  rintro ⟨m, n⟩
+  constructor
+  rintro hmn
+  exact hRS hmn
+  rintro hmn
+  rcases hR with ⟨_, total_order⟩
+  rcases (total_order m n) with h | h
+  exact h
+  rw[←ext_def R n m] at h
+  have hnm := hRS h
+  have meqn := hS m n hmn hnm
+  rw[meqn]
+  rw[meqn] at h
+  exact h
+
+theorem Exercise_4_4_29_a (L: BinRel ℝ) (hL: ∀ x y : ℝ, L x y  ↔ x < y):
+    strict_total_order L := by
+  constructor
+  constructor
+  rintro x
+  rw[hL]
+  by_contra h'
+  rw[lt_self_iff_false] at h'
+  exact h'
+  rintro x y z hxy hyz
+  rw[hL]
+  rw[hL] at hxy
+  rw[hL] at hyz
+  exact lt_trans hxy hyz
+  rintro x y
+  by_cases hxy: x < y
+  left
+  rw[hL]
+  exact hxy
+  rw[not_lt, le_iff_eq_or_lt] at hxy
+  rcases hxy with hxy | hxy
+  right; right
+  exact hxy.symm
+  right; left
+  rw[hL]
+  exact hxy
+
+theorem Exercise_4_4_29_b_part (A: Type) (R: BinRel A) (iₐ: Set (A × A))
+    (hiₐ: ∀ x y: A, (x, y) ∈ iₐ ↔ x = y):
+    partial_order R → strict_partial_order (RelFromExt (extension R \ iₐ)):= by
+  rintro hR
+  constructor
+  rintro x
+  rw[RelFromExt]
+  define; demorgan
+  right
+  rw[hiₐ]
+  rcases hR with ⟨_, trans, antisymm⟩
+  rintro x y z hxy hyz
+  rw[RelFromExt]
+  rw[RelFromExt] at hxy
+  rw[RelFromExt] at hyz
+  constructor
+  exact trans x y z hxy.1 hyz.1
+  by_contra h'
+  rw[hiₐ] at h'
+  rw[h'] at hxy
+  have hzeqy := antisymm z y hxy.1 hyz.1
+  apply hxy.2
+  rw[hiₐ]
+  exact hzeqy
+
+theorem Exercise_4_4_29_b (A: Type) (R: BinRel A) (iₐ: Set (A × A))
+    (hiₐ: ∀ x y: A, (x, y) ∈ iₐ ↔ x = y):
+    total_order R → strict_total_order (RelFromExt (extension R \ iₐ)):= by
+  rintro ⟨hpartial, htotal⟩
+  constructor
+  exact Exercise_4_4_29_b_part A R iₐ hiₐ hpartial
+  rintro x y
+  by_cases hxy: x = y
+  right; right
+  exact hxy
+  push_neg at hxy
+  rcases htotal x y with htotal | htotal
+  left
+  constructor
+  exact htotal
+  rw[hiₐ]
+  exact hxy
+  right; left
+  constructor
+  exact htotal
+  rw[hiₐ]
+  exact hxy.symm
+
+theorem Exercise_4_4_29_c_part (A: Type) (R: BinRel A) (iₐ: Set (A × A))
+    (hiₐ: ∀ x y: A, (x, y) ∈ iₐ ↔ x = y):
+    strict_partial_order R → partial_order (RelFromExt (extension R ∪ iₐ)):= by
+  rintro ⟨irrefl, trans⟩
+  constructor
+  rintro x
+  rw[RelFromExt]
+  right
+  rw[hiₐ]
+  constructor
+  rintro x y z (hxy | hxy) (hyz | hyz)
+  left
+  exact trans x y z hxy hyz
+  left
+  rw[hiₐ] at hyz
+  rw[←hyz]
+  exact hxy
+  left
+  rw[hiₐ] at hxy
+  rw[hxy]
+  exact hyz
+  right
+  rw[hiₐ] at hxy
+  rw[hiₐ] at hyz
+  rw[hiₐ]
+  rw[hxy]
+  exact hyz
+  rintro x y (hxy | hxy) (hyx | hyx)
+  contradict irrefl x
+  apply trans
+  exact hxy
+  exact hyx
+  rw[hiₐ] at hyx
+  exact hyx.symm
+  rw[hiₐ] at hxy
+  exact hxy
+  rw[hiₐ] at hxy
+  exact hxy
+
+theorem Exercise_4_4_29_c (A: Type) (R: BinRel A) (iₐ: Set (A × A))
+    (hiₐ: ∀ x y: A, (x, y) ∈ iₐ ↔ x = y):
+    strict_total_order R → total_order (RelFromExt (extension R ∪ iₐ)):= by
+  rintro ⟨hPartial, hTotal⟩
+  constructor
+  exact Exercise_4_4_29_c_part A R iₐ hiₐ hPartial
+  rintro x y
+  rcases hTotal x y with hTotal | hTotal | hTotal
+  left; left
+  exact hTotal
+  right; left
+  exact hTotal
+  left; right
+  rw[hiₐ]
+  exact hTotal
+
+theorem Exercise_4_4_30 (A: Type) (R T: BinRel A) (F: Set (Set (A × A)))
+    (hF: ∀ S: Set (A × A), S ∈ F ↔ extension R ⊆ S ∧ transitive (RelFromExt S))
+    (hT: smallestElt (sub (A × A)) (extension T) F):
+    symmetric R → symmetric T := by
+  rintro symm
+  rcases hT with ⟨hT, hT'⟩
+  rw[hF (extension T)] at hT
+  rcases hT with ⟨hsubset, htrans⟩
+  have h₁: extension R ⊆ inv (extension T) := by
+    rintro ⟨m, n⟩ hmn
+    have htemp:= symm m n hmn
+    rw[← ext_def R] at htemp
+    exact hsubset htemp
+  have h₂: transitive (RelFromExt (inv (extension T))) := by
+    rintro x y z hxy hyz
+    rw[RelFromExt] at hxy
+    rw[RelFromExt] at hyz
+    rw[RelFromExt]
+    exact htrans z y x hyz hxy
+  have h₃: extension T ⊆ inv (extension T) := by
+    apply hT'
+    rw[hF]
+    constructor
+    exact h₁
+    exact h₂
+  rintro x y hxy
+  rw[←ext_def T] at hxy
+  exact h₃ hxy
+

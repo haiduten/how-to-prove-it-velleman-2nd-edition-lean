@@ -23,6 +23,9 @@ def extension {A B : Type} (R : Rel A B) : Set (A × B) :=
 def reflexive {A : Type} (R : BinRel A) : Prop :=
   ∀ (x : A), R x x
 
+def irreflexive {A : Type} (R : BinRel A) : Prop :=
+  ∀ (x : A), ¬ R x x
+
 def reflexive_on {A : Type} (B: Set A) (R : BinRel A) : Prop :=
   ∀ (x : A), x ∈ B → R x x
 
@@ -49,11 +52,17 @@ def antisymmetric_on {A : Type} (B: Set A) (R : BinRel A) : Prop :=
 def partial_order {A : Type} (R : BinRel A) : Prop :=
   reflexive R ∧ transitive R ∧ antisymmetric R
 
+def strict_partial_order {A : Type} (R : BinRel A) : Prop :=
+  irreflexive R ∧ transitive R
+
 def partial_order_on {A : Type} (B: Set A) (R : BinRel A) : Prop :=
   reflexive_on B R ∧ transitive_on B R ∧ antisymmetric_on B R
 
 def total_order {A : Type} (R : BinRel A) : Prop :=
   partial_order R ∧ ∀ (x y : A), R x y ∨ R y x
+
+def strict_total_order {A : Type} (R : BinRel A) : Prop :=
+  strict_partial_order R ∧ ∀ (x y : A), R x y ∨ R y x ∨ x = y
 
 def total_order_on {A : Type} (B: Set A) (R : BinRel A) : Prop :=
   partial_order_on B R ∧ ∀ (x y : A), x ∈ B ∧ y ∈ B → R x y ∨ R y x

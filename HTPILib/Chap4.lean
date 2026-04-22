@@ -30,7 +30,10 @@ def reflexive_on {A : Type} (B: Set A) (R : BinRel A) : Prop :=
   ∀ (x : A), x ∈ B → R x x
 
 def symmetric {A : Type} (R : BinRel A) : Prop :=
-  ∀ (x y : A), R x y → R y x
+  ∀ (x y : A),  R x y → R y x
+
+def symmetric_on {A : Type} (B: Set A) (R : BinRel A) : Prop :=
+  ∀ (x y : A), x ∈ B ∧ y ∈ B → R x y → R y x
 
 def transitive {A : Type} (R : BinRel A) : Prop :=
   ∀ (x y z : A), R x y → R y z → R x z
@@ -96,8 +99,14 @@ def glb {A : Type} (R : BinRel A) (a : A) (B : Set A) : Prop :=
 def equiv_rel {A : Type} (R : BinRel A) : Prop :=
   reflexive R ∧ symmetric R ∧ transitive R
 
+def equiv_rel_on {A : Type} (B: Set A) (R : BinRel A) : Prop :=
+  reflexive_on B R ∧ symmetric_on B R ∧ transitive_on B R
+
 def equivClass {A : Type} (R : BinRel A) (x : A) : Set A :=
   {y : A | R y x}
+
+def equivClass_on {A : Type} (B: Set A) (R : BinRel A) (x : A) : Set A :=
+  {y : A | R y x ∧ x ∈ B ∧ y ∈ B}
 
 def mod (A : Type) (R : BinRel A) : Set (Set A) :=
   {equivClass R x | x : A}
@@ -109,6 +118,9 @@ def pairwise_disjoint {A : Type} (F : Set (Set A)) : Prop :=
 
 def partition {A : Type} (F : Set (Set A)) : Prop :=
   (∀ (x : A), x ∈ ⋃₀ F) ∧ pairwise_disjoint F ∧ ∀ X ∈ F, ¬empty X
+
+def partition_on {A : Type} (B: Set A) (F : Set (Set A)) : Prop :=
+  (∀ x ∈ B, x ∈ ⋃₀ F) ∧ pairwise_disjoint F ∧ ∀ X ∈ F, ¬empty X
 
 def EqRelFromPart {A : Type} (F : Set (Set A)) (x y : A) : Prop :=
   ∃ X ∈ F, x ∈ X ∧ y ∈ X

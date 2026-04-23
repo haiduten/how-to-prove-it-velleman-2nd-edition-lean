@@ -696,4 +696,5 @@ theorem Exercise_4_5_17_a (U: Type) (A B: Set U) (R S: BinRel U)
   simp[ext_def] at hnm
   right
   exact symmS m n (And.intro hmB hnB) hnm
+  rintro x y z ⟨hx, hy, hz⟩ (hxy | hxy) hyz
   

@@ -696,5 +696,807 @@ theorem Exercise_4_5_17_a (U: Type) (A B: Set U) (R S: BinRel U)
   simp[ext_def] at hnm
   right
   exact symmS m n (And.intro hmB hnB) hnm
-  rintro x y z ⟨hx, hy, hz⟩ (hxy | hxy) hyz
-  
+  rintro x y z ⟨hx, hy, hz⟩ (hxy | hxy) (hyz | hyz)
+  rcases (hR' hxy) with ⟨hx', hy'⟩
+  rcases (hR' hyz) with ⟨_, hz'⟩
+  left
+  apply transR
+  constructor
+  exact hx'
+  apply And.intro hy' hz'
+  exact hxy
+  exact hyz
+  contradict hAB
+  push_neg
+  use y
+  constructor
+  exact (hR' hxy).2
+  exact (hS' hyz).1
+  right
+  contradict hAB
+  push_neg
+  use y
+  constructor
+  exact (hR' hyz).1
+  exact (hS' hxy).2
+  right
+  apply transS
+  constructor
+  exact (hS' hxy).1
+  constructor
+  exact (hS' hxy).2
+  exact (hS' hyz).2
+  exact hxy
+  exact hyz
+
+theorem Exercise_4_5_17_b (U: Type) (A B: Set U) (R S: BinRel U)
+    (hR': extension R ⊆ A ×ˢ A) (hS': extension S ⊆ B ×ˢ B)
+    (hR: equiv_rel_on A R) (hS: equiv_rel_on B S) (hAB: A ∩ B = ∅):
+    (∀ x ∈ A, equivClass (RelFromExt (extension R ∪ extension S)) x = equivClass R x) ∧
+    ∀ y ∈ B, equivClass (RelFromExt (extension R ∪ extension S)) y = equivClass S y := by
+  rcases hR with ⟨reflR, symmR, transR⟩
+  rcases hS with ⟨reflS, symmS, transS⟩
+  constructor
+  rintro x hx
+  apply Set.ext
+  rintro y
+  constructor
+  simp[equivClass, RelFromExt]
+  rintro (hy | hy)
+  exact hy
+  contradict hAB
+  push_neg
+  use x
+  constructor
+  exact hx
+  exact (hS' hy).2
+  simp[equivClass, RelFromExt, ext_def]
+  rintro hy
+  left
+  exact hy
+  rintro x hx
+  apply Set.ext
+  rintro y
+  constructor
+  simp[equivClass, RelFromExt]
+  rintro (hy | hy)
+  contradict hAB
+  push_neg
+  use x
+  constructor
+  exact (hR' hy).2
+  exact hx
+  exact hy
+  simp[equivClass, RelFromExt, ext_def]
+  rintro hy
+  right
+  exact hy
+
+theorem Exercise_4_5_17_c (U: Type) (A B: Set U) (R S: BinRel U)
+    (hR': extension R ⊆ A ×ˢ A) (hS': extension S ⊆ B ×ˢ B)
+    (hR: equiv_rel_on A R) (hS: equiv_rel_on B S) (hAB: A ∩ B = ∅):
+    mod_on U (A ∪ B) (RelFromExt (extension R ∪ extension S))  = mod_on U A R ∪ mod_on U B S := by
+  apply Set.ext
+  rintro X
+  constructor
+  rintro hX
+  rcases hX with ⟨x, ⟨(hX | hX), hX'⟩⟩
+  left
+  use x
+  constructor
+  exact hX
+  rw[← hX']
+  apply Set.ext
+  rintro a
+  constructor
+  simp[equivClass, RelFromExt, ext_def]
+  rintro ha
+  left
+  exact ha
+  simp[equivClass, RelFromExt]
+  rintro (ha | ha)
+  exact ha
+  contradict hAB
+  push_neg
+  use x
+  constructor
+  exact hX
+  exact (hS' ha).2
+  right
+  use x
+  constructor
+  exact hX
+  rw[← hX']
+  apply Set.ext
+  rintro a
+  constructor
+  simp[equivClass, RelFromExt]
+  rintro ha
+  right
+  exact ha
+  simp[equivClass, RelFromExt]
+  rintro (ha | ha)
+  contradict hAB
+  push_neg
+  use x
+  constructor
+  exact (hR' ha).2
+  exact hX
+  exact ha
+  rintro (hX | hX)
+  rcases hX with ⟨u, hu, hu'⟩
+  use u
+  constructor
+  apply Or.inl hu
+  rw[← hu']
+  apply Set.ext
+  rintro y
+  constructor
+  simp[equivClass, RelFromExt]
+  rintro (hy | hy)
+  exact hy
+  contradict hAB
+  push_neg
+  use u
+  constructor
+  exact hu
+  exact (hS' hy).2
+  simp[equivClass, RelFromExt]
+  rintro hy
+  left
+  exact hy
+  rcases hX with ⟨u, hu, hu'⟩
+  use u
+  constructor
+  apply Or.inr hu
+  rw[← hu']
+  apply Set.ext
+  rintro y
+  constructor
+  simp[equivClass, RelFromExt]
+  rintro (hy | hy)
+  contradict hAB
+  push_neg
+  use u
+  constructor
+  exact (hR' hy).2
+  exact hu
+  exact hy
+  simp[equivClass, RelFromExt]
+  rintro hy
+  right
+  exact hy
+
+theorem Exercise_4_5_18 (U: Type) (A: Set U) (F G FG: Set (Set U))
+    (hF: partition F) (hG: partition G)
+    (hFG: ∀ Z: Set U, Z ∈ FG ↔ Z ≠ ∅ ∧ ∃ X ∈ F, ∃ Y ∈ G, Z = X ∩ Y):
+    partition FG := by
+  rcases hF with ⟨allF, disjointF, emptyF⟩
+  rcases hG with ⟨allG, disjointG, emptyG⟩
+  constructor
+  rintro x
+  rcases (allF x) with ⟨XF, hXF, hXF'⟩
+  rcases (allG x) with ⟨XG, hXG, hXG'⟩
+  use (XF ∩ XG)
+  constructor
+  rw[hFG]
+  constructor
+  push_neg
+  use x
+  constructor
+  exact hXF'
+  exact hXG'
+  use XF
+  constructor
+  exact hXF
+  use XG
+  constructor
+  exact hXF'
+  exact hXG'
+  constructor
+  rintro X hX Y hY hXNeqY
+  rw[empty]
+  by_contra h'
+  rcases h' with ⟨u, huX, huY⟩
+  contradict hXNeqY
+  rw[hFG] at hX
+  rw[hFG] at hY
+  rcases hX.2 with ⟨F', hF', G', hG', hG''⟩
+  rcases hY.2 with ⟨J', hJ', K', hK', hK''⟩
+  rw[hG''] at huX
+  rw[hK''] at huY
+  rw[hG'']
+  rw[hK'']
+  have h1: F' = J' := by
+    have h := disjointF F' hF' J' hJ'
+    contrapos at h
+    simp at h
+    exact h u huX.1 huY.1
+  have h2: G' = K' := by
+    have h := disjointG G' hG' K' hK'
+    contrapos at h
+    simp at h
+    exact h u huX.2 huY.2
+  rw[h1, h2]
+  rintro X hX
+  by_contra h'
+  rw[hFG] at hX
+  contradict h'
+  have hX := hX.1
+  push_neg at hX
+  rcases hX with ⟨p, hP⟩
+  use p
+
+/-
+Exercise 4_5_19
+{ℤ⁺, ℤ⁻, {0}, (ℝ \ ℤ)⁺, (ℝ \ ℤ)⁻}
+-/
+
+theorem Exercise_4_5_20_a (A: Type) (R S: BinRel A) (hR: equiv_rel R)
+    (hS: equiv_rel S):
+    equiv_rel (RelFromExt ((extension S) ∩ (extension R))) := by
+  rcases hR with ⟨reflR, symmR, transR⟩
+  rcases hS with ⟨reflS, symmS, transS⟩
+  constructor
+  rintro x
+  simp[RelFromExt, ext_def]
+  constructor
+  exact reflS x
+  exact reflR x
+  constructor
+  rintro x y hxy
+  simp[RelFromExt, ext_def] at hxy
+  rcases hxy with ⟨hxy, hxy'⟩
+  simp[RelFromExt, ext_def]
+  constructor
+  exact symmS x y hxy
+  exact symmR x y hxy'
+  rintro x y z hxy hyz
+  simp[RelFromExt, ext_def] at hxy
+  simp[RelFromExt, ext_def] at hyz
+  simp[RelFromExt, ext_def]
+  rcases hxy with ⟨hxy, hxy'⟩
+  rcases hyz with ⟨hyz, hyz'⟩
+  constructor
+  exact transS x y z hxy hyz
+  exact transR x y z hxy' hyz'
+
+theorem Exercise_4_5_20_b (A: Type) (R S: BinRel A) (hR: equiv_rel R)
+    (hS: equiv_rel S):
+    ∀ x : A, equivClass (RelFromExt ((extension S) ∩ (extension R))) x = equivClass R x ∩ equivClass S x := by
+  rintro x
+  apply Set.ext
+  rintro a
+  constructor
+  simp [equivClass, RelFromExt, ext_def]
+  rintro hSax hRax
+  constructor
+  exact hRax
+  exact hSax
+  simp [equivClass, RelFromExt, ext_def]
+  rintro hRax hSax
+  constructor
+  exact hSax
+  exact hRax
+
+theorem Exercise_4_5_20_c (A: Type) (R S: BinRel A) (RS: Set (Set A)) (hR: equiv_rel R)
+    (hS: equiv_rel S) (hRS: ∀ X: Set A, X ∈ RS ↔ X ≠ ∅ ∧ ∃ Y ∈ mod A R, ∃ Z ∈ mod A S, X = Y ∩ Z):
+    mod A (RelFromExt ((extension S) ∩ (extension R))) = RS := by
+    rcases hR with ⟨reflR, symmR, transR⟩
+    rcases hS with ⟨reflS, symmS, transS⟩
+    apply Set.ext
+    rintro X
+    constructor
+    rintro hX
+    simp[hRS]
+    rcases hX with ⟨x , hx⟩
+    simp[equivClass, RelFromExt, ext_def] at hx
+    rw[← hx]
+    constructor
+    push_neg
+    use x
+    simp
+    constructor
+    exact reflS x
+    exact reflR x
+    use equivClass R x
+    constructor
+    simp[mod]
+    use equivClass S x
+    constructor
+    simp[mod]
+    apply Set.ext
+    rintro a
+    constructor
+    rintro ha
+    define at ha
+    rcases ha with ⟨ha, ha'⟩
+    simp [equivClass]
+    constructor
+    exact ha'
+    exact ha
+    simp[equivClass]
+    rintro ha ha'
+    constructor
+    exact ha'
+    exact ha
+    rintro hRS'
+    simp[hRS] at hRS'
+    rcases hRS' with ⟨hRS, hRS'⟩
+    rcases hRS' with ⟨P, hP, Q, hQ, neq⟩
+    rcases hP with ⟨a, ha⟩
+    rcases hQ with ⟨b, hb⟩
+    push_neg at hRS
+    rw[neq, ← ha, ← hb] at hRS
+    rcases hRS with ⟨z, hz, hz'⟩
+    use z
+    simp[equivClass, RelFromExt, ext_def, neq, ← ha, ← hb]
+    apply Set.ext
+    rintro q
+    constructor
+    simp[equivClass] at hz
+    simp[equivClass] at hz'
+    rintro hq
+    simp at hq
+    rcases hq with ⟨hq, hq'⟩
+    simp
+    constructor
+    exact transR q z a hq' hz
+    exact transS q z b hq hz'
+    simp
+    rintro hq hq'
+    simp[equivClass] at hz
+    simp[equivClass] at hz'
+    constructor
+    exact transS q b z hq' (symmS z b hz')
+    exact transR q a z hq (symmR z a hz)
+
+theorem Exercise_4_5_21 (A B: Type) (F: Set (Set A)) (G: Set (Set B)) (hF: partition F)
+    (hG: partition G):
+    let FG: Set (Set (A × B)) := {Z : Set (A × B) | ∃ X ∈ F, ∃ Y ∈ G, (Z = X ×ˢ Y)};
+    partition FG := by
+  rcases hF with ⟨allF, disjointF, emptyF⟩
+  rcases hG with ⟨allG, disjointG, emptyG⟩
+  constructor
+  rintro ⟨m , n⟩
+  rcases (allF m) with ⟨M, hM, hM'⟩
+  rcases (allG n) with ⟨N, hN, hN'⟩
+  use (M ×ˢ N)
+  constructor
+  use M
+  constructor
+  exact hM
+  use N
+  constructor
+  exact hM'
+  exact hN'
+  constructor
+  rintro Z hZ Y hY
+  rcases hZ with ⟨F', hF', G', hG', hF'G'⟩
+  rcases hY with ⟨F'', hF'', G'', hG'', hF''G''⟩
+  contrapos
+  rintro h
+  rcases h with ⟨⟨p, q⟩ , hpq, hpq'⟩
+  rw[hF'G', hF''G'']
+  rw[hF'G'] at hpq
+  rw[hF''G''] at hpq'
+  have hFirst: F' = F'' := by
+    have h := disjointF F' hF' F'' hF''
+    contrapos at h
+    apply h
+    use p
+    constructor
+    exact hpq.1
+    exact hpq'.1
+  have hSecond: G' = G'' := by
+    have h := disjointG G' hG' G'' hG''
+    contrapos at h
+    apply h
+    use q
+    constructor
+    exact hpq.2
+    exact hpq'.2
+  rw[hFirst, hSecond]
+  rintro X hX
+  rcases hX with ⟨F', hF', G', hG', hF'G'⟩
+  rw[hF'G']
+  define
+  push_neg
+  have hFirst := emptyF F' hF'
+  define at hFirst
+  push_neg at hFirst
+  rcases hFirst with ⟨a, ha⟩
+  have hSecond := emptyG G' hG'
+  define at hSecond
+  push_neg at hSecond
+  rcases hSecond with ⟨b, hb⟩
+  use (a, b)
+  constructor
+  exact ha
+  exact hb
+
+/-
+Exercise 4_5_22
+{(ℝ+, ℝ+), (ℝ-, ℝ-), (ℝ+, ℝ-), (ℝ-, ℝ+), (ℝ+, 0), (ℝ-, 0), (0, ℝ+), (0, ℝ-), (0,0)}
+(ℝ+, ℝ+) = top right quadrant
+(ℝ-, ℝ-) = bottom left quadrant
+(ℝ+, ℝ-) = bottom right quadrant
+(ℝ-, ℝ+) = top left quadrant
+(ℝ+, 0) = right x axis
+(ℝ-, 0) = left x axis
+(0, ℝ+) = top y axis
+(0, ℝ-) = bottom y axis
+(0,0) = center
+-/
+
+theorem Exercise_4_5_23_a (A B: Type) (R: BinRel A) (S: BinRel B)
+    (hR: equiv_rel R) (hS: equiv_rel S):
+    let T := {((a, b), (a', b')): (A × B) × (A × B) | R a a' ∧ S b b'}
+    equiv_rel (RelFromExt T) := by
+  rcases hR with ⟨reflR, symmR, transR⟩
+  rcases hS with ⟨reflS, symmS, transS⟩
+  constructor
+  rintro ⟨m , n⟩
+  define
+  constructor
+  exact reflR m
+  exact reflS n
+  constructor
+  rintro ⟨m , n⟩  ⟨m', n'⟩ hmn
+  define at hmn
+  define
+  constructor
+  exact symmR m m' hmn.1
+  exact symmS n n' hmn.2
+  rintro ⟨x, x'⟩ ⟨y, y'⟩ ⟨z, z'⟩ hxy hyz
+  define
+  define at hxy
+  define at hyz
+  constructor
+  exact transR x y z hxy.1 hyz.1
+  exact transS x' y' z' hxy.2 hyz.2
+
+theorem Exercise_4_5_23_b (A B: Type) (R: BinRel A) (S: BinRel B) (a : A) (b : B)
+    (hR: equiv_rel R) (hS: equiv_rel S):
+    let T := {((a, b), (a', b')): (A × B) × (A × B) | R a a' ∧ S b b'}
+    equivClass (RelFromExt T) (a, b)  = equivClass R a ×ˢ equivClass S b := by
+  apply Set.ext
+  rintro ⟨m, n⟩
+  constructor
+  rintro hmn
+  rcases hmn with ⟨h, h'⟩
+  constructor
+  define
+  exact h
+  define
+  exact h'
+  rintro hmn
+  simp[equivClass] at hmn
+  define
+  constructor
+  exact hmn.1
+  exact hmn.2
+
+theorem Exercise_4_5_23_c (A B: Type) (R: BinRel A) (S: BinRel B)
+    (hR: equiv_rel R) (hS: equiv_rel S):
+    let T := {((a, b), (a', b')): (A × B) × (A × B) | R a a' ∧ S b b'}
+    mod (A × B) (RelFromExt T) = {Z : Set (A × B) | ∃ X ∈ (mod A R), ∃ Y ∈ (mod B S), (Z = X ×ˢ Y)} := by
+  apply Set.ext
+  rintro X
+  constructor
+  rintro hX
+  rcases hX with ⟨⟨a, b⟩, h⟩
+  simp
+  use (equivClass R a)
+  constructor
+  use a
+  use (equivClass S b)
+  constructor
+  use b
+  rw[← h]
+  apply Set.ext
+  rintro ⟨a', b'⟩
+  constructor
+  rintro ha'b'
+  define at ha'b'
+  constructor
+  exact ha'b'.1
+  exact ha'b'.2
+  rintro ha'b'
+  rcases ha'b' with ⟨ha'b'1, ha'b'2⟩
+  define
+  constructor
+  exact ha'b'1
+  exact ha'b'2
+  rintro hX
+  define at hX
+  define
+  rcases hX with ⟨A', hA', B', hB', hX ⟩
+  rcases hA' with ⟨a', ha'⟩
+  rcases hB' with ⟨b', hb'⟩
+  use (a', b')
+  rw[hX, ← ha', ← hb']
+  apply Set.ext
+  rintro ⟨m, n⟩
+  constructor
+  rintro hmn
+  define at hmn
+  constructor
+  exact hmn.1
+  exact hmn.2
+  rintro hmn
+  define at hmn
+  define
+  constructor
+  exact hmn.1
+  exact hmn.2
+
+theorem Exercise_4_5_24_a (A: Type) (R S: BinRel A) (hS: equiv_rel S)
+    (hCom: ∀ x y x' y' : A, S x x' → S y y' → (R x y ↔ R x' y')):
+    ∃! T : Set ((Set A) × (Set A)), T ⊆ (mod A S ×ˢ mod A S) ∧  (∀ x y : A, (equivClass S x, equivClass S y) ∈ T ↔ R x y) := by
+  rcases hS with ⟨reflS, symmS, transS⟩
+  exists_unique
+  use ({(X, Y) :  (Set A) × (Set A) | X ∈ mod A S ∧ Y ∈ mod A S ∧  ∀ x ∈ X, ∀ y ∈ Y, R x y})
+  constructor
+  rintro ⟨X, Y⟩ ⟨hXY, hXY', hXY''⟩
+  constructor
+  exact hXY
+  exact hXY'
+  rintro x y
+  constructor
+  rintro ⟨hxy, hxy', hxy''⟩
+  exact hxy'' x (reflS x) y (reflS y)
+  rintro hxy
+  define
+  constructor
+  use x
+  constructor
+  use y
+  rintro x' hx' y' hy'
+  exact (hCom x' y' x y hx' hy').mpr hxy
+  rintro T₁ T₂ ⟨hT₁, hT₁'⟩  ⟨hT₂, hT₂'⟩
+  apply Set.ext
+  rintro ⟨X, Y⟩
+  constructor
+  rintro hXY
+  rcases hT₁ hXY with ⟨hX, hY⟩
+  rcases hX with ⟨x, hx⟩
+  rcases hY with ⟨y, hy⟩
+  simp at hx
+  simp at hy
+  simp [← hx, ← hy]
+  apply (hT₂' x y).mpr
+  apply (hT₁' x y).mp
+  rw[hx, hy]
+  exact hXY
+  rintro hXY
+  rcases hT₂ hXY with ⟨hX, hY⟩
+  rcases hX with ⟨x, hx⟩
+  rcases hY with ⟨y, hy⟩
+  simp at hx
+  simp at hy
+  simp [← hx, ← hy]
+  apply (hT₁' x y).mpr
+  apply (hT₂' x y).mp
+  rw[hx, hy]
+  exact hXY
+
+theorem Exercise_4_5_24_b (A: Type) (T: BinRel (Set A)) (R S: BinRel A) (hS: equiv_rel S)
+    (hT: extension T ⊆ ((mod A S) ×ˢ (mod A S))) (hT': ∀ x y : A, T (equivClass S x) (equivClass S x) ↔ R x y):
+    ∀ x y x' y' : A, S x x' ∧ S y y' → (R x y ↔ R x' y') := by
+  rcases hS with ⟨reflS, symmS, transS⟩
+  rintro x y x' y' ⟨hSxx', hSyy'⟩
+  constructor
+  rintro hRxy
+  have h := (hT' x y).mpr hRxy
+  have h1: (equivClass S x) = (equivClass S x') := by
+    apply Set.ext
+    rintro a
+    constructor
+    rintro ha
+    define at ha
+    define
+    exact transS a x x' ha hSxx'
+    rintro ha
+    define
+    define at ha
+    exact transS a x' x ha (symmS x x' hSxx')
+  apply (hT' x' y').mp
+  rw[h1] at h
+  exact h
+  rintro hRx'y'
+  have h := (hT' x' y').mpr hRx'y'
+  have h1: (equivClass S x') = (equivClass S x) := by
+    apply Set.ext
+    rintro a
+    constructor
+    rintro ha
+    define at ha
+    define
+    exact transS a x' x ha (symmS x x' hSxx')
+    rintro ha
+    define
+    define at ha
+    exact transS a x x' ha hSxx'
+  apply (hT' x y).mp
+  rw[h1] at h
+  exact h
+
+theorem Exercise_4_5_25_a (A: Type) (R: BinRel A) (hReflR: reflexive R)
+    (hTransR: transitive R): let S := (extension R) ∩ (inv (extension R))
+    equiv_rel (RelFromExt S) := by
+  constructor
+  rintro x
+  constructor
+  exact hReflR x
+  rw[inv]
+  exact hReflR x
+  constructor
+  rintro x y ⟨hxy, hxy'⟩
+  constructor
+  exact hxy'
+  exact hxy
+  rintro x y z ⟨hxy, hxy'⟩ ⟨hyz, hyz'⟩
+  constructor
+  exact hTransR x y z hxy hyz
+  exact hTransR z y x hyz' hxy'
+
+theorem Exercise_4_5_25_b (A: Type) (R S: BinRel A) (hReflR: reflexive R)
+    (hTransR: transitive R): let S := (extension R) ∩ (inv (extension R))
+    let S := RelFromExt S
+    ∃! T : Set ((Set A) × (Set A)), T ⊆ (mod A S ×ˢ mod A S) ∧
+    (∀ x y : A, (equivClass S x, equivClass S y) ∈ T ↔ R x y) := by
+  have g := Exercise_4_5_25_a A R hReflR hTransR
+  simp at g
+  apply Exercise_4_5_24_a A R (RelFromExt (extension R ∩ inv (extension R))) g
+  rintro x y x' y' ⟨hSxx, hSxx'⟩ ⟨hSyy, hSyy'⟩
+  constructor
+  rintro hxy
+  exact hTransR x' y y' (hTransR x' x y hSxx' hxy) hSyy
+  rintro h
+  apply hTransR x x' y hSxx (hTransR x' y' y h hSyy')
+
+theorem Exercise_4_5_25_c (A: Type) (R S: BinRel A) (T: BinRel (Set A)) (hReflR: reflexive R)
+    (hTransR: transitive R) (hS: S =  RelFromExt ((extension R) ∩ (inv (extension R))))
+    (hT : extension T ⊆ (mod A S ×ˢ mod A S))
+    (hT' : (∀ x y : A, T (equivClass S x) (equivClass S y) ↔ R x y)):
+    partial_order_on (mod A S) T := by
+  constructor
+  rintro X hX
+  rcases hX with ⟨x, hx⟩
+  rw[← hx]
+  apply (hT' x x).mpr
+  exact hReflR x
+  constructor
+  rintro X Y Z ⟨hX, hY, hZ⟩ hXY hYZ
+  rcases hX with ⟨x, hx⟩
+  rcases hY with ⟨y, hy⟩
+  rcases hZ with ⟨z, hz⟩
+  rw[← hx, ← hz]
+  rw[← hx, ← hy] at hXY
+  rw[← hy, ← hz] at hYZ
+  apply (hT' x z).mpr
+  apply (hT' x y).mp at hXY
+  apply (hT' y z).mp at hYZ
+  exact hTransR x y z hXY hYZ
+  rintro X Y ⟨hX, hY⟩ hXY hYX
+  rcases hX with ⟨x, hx⟩
+  rcases hY with ⟨y, hy⟩
+  rw[← hx, ← hy]
+  rw[← hx, ← hy] at hXY
+  rw[← hy, ← hx] at hYX
+  apply (hT' x y).mp at hXY
+  apply (hT' y x).mp at hYX
+  apply Set.ext
+  rintro a
+  constructor
+  rintro ha
+  rw[hS] at ha
+  rcases ha with ⟨ha, ha'⟩
+  rw[hS]
+  constructor
+  exact hTransR a x y ha hXY
+  exact hTransR y x a hYX ha'
+  rintro ha
+  rw[hS] at ha
+  rcases ha with ⟨ha, ha'⟩
+  rw[hS]
+  constructor
+  exact hTransR a y x ha hYX
+  exact hTransR x y a hXY ha'
+
+theorem Exercise_4_5_26_a (A : Set (Set ℤ)) (I: Set ℤ) (R: Set (Set ℤ × Set ℤ)) (hI: I = {i: ℤ | i > 0 ∧ i ≤ 100})
+    (hA: A = 𝒫 I) (hR: R = {(X, Y) :  Set ℤ × Set ℤ  | X ∈ A ∧ Y ∈ A ∧  Y.ncard ≥ X.ncard  } ):
+    preorder_on A (RelFromExt R) := by
+  constructor
+  rintro X hX
+  simp [RelFromExt , hR]
+  exact hX
+  rintro X Y Z ⟨hX, hY, hZ⟩
+  simp[RelFromExt, hR]
+  rintro hX hY hXY hY hZ hYZ
+  constructor
+  exact hX
+  constructor
+  exact hZ
+  exact le_trans hXY hYZ
+
+/-
+Exercise 4_5_26_b
+A / S = set of 1 element sets, set of 2 element sets, set of 3 element sets...
+T = pairs of equivalence classes X Y, where an element of Y is at least as large
+an element of X
+A / S has 101 elements
+T is a total order
+-/
+
+theorem Exercise_4_5_27_a (A: Type) (P: Set (Set (Set A)))
+    (hP: P = {X | partition X})
+    (R: Set (Set (Set A) × Set (Set A)))
+    (hR: R = {(F, G): Set (Set A) × Set (Set A) | F ∈ P ∧ G ∈ P ∧  ∀ X ∈ F, ∃ Y ∈ G, X ⊆ Y}):
+    partial_order_on P (RelFromExt R) := by
+  constructor
+  rintro L hL
+  simp[RelFromExt, hR]
+  constructor
+  exact hL
+  rintro X hX
+  use X
+  constructor
+  rintro X Y Z ⟨hX, hY, hZ⟩ hXY hYZ
+  simp[RelFromExt, hR]
+  constructor
+  exact hX
+  constructor
+  exact hZ
+  simp[RelFromExt, hR] at hXY
+  simp[RelFromExt, hR] at hYZ
+  rcases hXY with ⟨_, _, hXY⟩
+  rcases hYZ with ⟨_, _, hYZ⟩
+  rintro Q hQ
+  rcases hXY Q hQ with ⟨L, hL, hQL⟩
+  rcases hYZ L hL with ⟨M, hM, hLM⟩
+  use M
+  constructor
+  exact hM
+  exact subset_trans hQL hLM
+  rintro F G ⟨hF, hG⟩ hFG hGF
+  simp[RelFromExt, hR] at hFG
+  simp[RelFromExt, hR] at hGF
+  rcases hFG with ⟨_, _, hFG⟩
+  rcases hGF with ⟨_, _, hGF⟩
+  apply Set.ext
+  rintro L
+  constructor
+  rintro hL
+  rcases hFG L hL with ⟨M, hM, hLM⟩
+  rcases hGF M hM with ⟨N, hN, hMN⟩
+  rw[hP] at hF
+  define at hF
+  rcases hF with ⟨_, hF, hF'⟩
+  have h: L = N := by
+    have hF := hF L hL N hN
+    contrapos at hF
+    have hF' := hF' L hL
+    simp[empty] at hF'
+    rcases hF' with ⟨s, hs⟩
+    apply hF
+    use s
+    constructor
+    exact hs
+    have final: L ⊆ N :=  by
+      apply subset_trans
+      exact hLM
+      exact hMN
+    exact final hs
+  have h': L = M := by
+    rw[← h] at hMN
+    apply Set.ext
+    rintro x
+    constructor
+    rintro hx
+    exact hLM hx
+    rintro hx
+    exact hMN hx
+  rw[← h'] at hM
+  exact hM

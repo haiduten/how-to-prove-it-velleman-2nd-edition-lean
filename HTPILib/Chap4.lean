@@ -55,6 +55,11 @@ def antisymmetric_on {A : Type} (B: Set A) (R : BinRel A) : Prop :=
 def partial_order {A : Type} (R : BinRel A) : Prop :=
   reflexive R ∧ transitive R ∧ antisymmetric R
 
+def preorder {A : Type} (R : BinRel A) : Prop :=
+  reflexive R ∧ transitive R
+
+def preorder_on {A : Type} (B: Set A) (R : BinRel A) : Prop :=
+  reflexive_on B R ∧ transitive_on B R
 def strict_partial_order {A : Type} (R : BinRel A) : Prop :=
   irreflexive R ∧ transitive R
 
@@ -111,6 +116,9 @@ def equivClass_on {A : Type} (B: Set A) (R : BinRel A) (x : A) : Set A :=
 def mod (A : Type) (R : BinRel A) : Set (Set A) :=
   {equivClass R x | x : A}
 
+def mod_on (A : Type) (B: Set A)  (R : BinRel A) : Set (Set A) :=
+  {equivClass R x | x ∈ B}
+
 def empty {A : Type} (X : Set A) : Prop := ¬∃ (x : A), x ∈ X
 
 def pairwise_disjoint {A : Type} (F : Set (Set A)) : Prop :=
@@ -121,6 +129,10 @@ def partition {A : Type} (F : Set (Set A)) : Prop :=
 
 def partition_on {A : Type} (B: Set A) (F : Set (Set A)) : Prop :=
   (∀ x ∈ B, x ∈ ⋃₀ F) ∧ pairwise_disjoint F ∧ ∀ X ∈ F, ¬empty X
+
+def refines_on {A : Type} (B: Set A) (F G: Set (Set A))
+    (hF: partition_on B F) (hG: partition_on B G ): Prop :=
+  ∀ X ∈ F, ∃ Y ∈ G, X ⊆ Y
 
 def EqRelFromPart {A : Type} (F : Set (Set A)) (x y : A) : Prop :=
   ∃ X ∈ F, x ∈ X ∧ y ∈ X

@@ -210,3 +210,21 @@ theorem Exercise_5_1_9 (U: Type) (A A' B: Set U) (hA: A ⊆ A') (hB: B ≠ ∅)
   apply hy''.1
   apply hy''.2
   apply hy'.2
+
+theorem Exercise_5_1_10 (A B: Type) (f g: A → B) (h: graph f ≠  graph g):
+    ¬is_func_graph ((graph f) ∆ (graph g)) := by
+  simp[Set.ext_iff] at h
+  push_neg at h
+  rcases h with ⟨x, y, (hmn | hmn)⟩
+  simp[is_func_graph]
+  use x
+  by_contra h'
+  rcases h' with ⟨y' , hy', hy''⟩
+  have hy'' := hy'' (g x)
+  simp at hy''
+  have h: (x, g x) ∈ graph f ∆ graph g  := by
+    define
+    right
+    constructor
+    rfl
+    define

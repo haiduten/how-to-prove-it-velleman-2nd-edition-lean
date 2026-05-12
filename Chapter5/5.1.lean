@@ -220,11 +220,300 @@ theorem Exercise_5_1_10 (A B: Type) (f g: A → B) (h: graph f ≠  graph g):
   use x
   by_contra h'
   rcases h' with ⟨y' , hy', hy''⟩
-  have hy'' := hy'' (g x)
-  simp at hy''
+  have hy''' := hy'' (g x)
+  simp at hy'''
   have h: (x, g x) ∈ graph f ∆ graph g  := by
     define
     right
     constructor
     rfl
     define
+    rcases hmn with ⟨hmn1, hmn2⟩
+    simp[graph] at hmn1
+    simp[graph] at hmn2
+    push_neg
+    push_neg at hmn2
+    symm
+    rw[hmn1]
+    exact hmn2
+  have hy''' := hy''' h
+  have h': (x, f x) ∈ graph f ∆ graph g := by
+    define
+    left
+    constructor
+    rfl
+    rcases hmn with ⟨hmn1, hmn2⟩
+    simp[graph] at hmn1
+    rw[← hmn1] at hmn2
+    exact hmn2
+  have hy'' := hy'' (f x) h'
+  rw[←  hy'''] at hy''
+  rcases hmn with ⟨hmn1, hmn2⟩
+  simp[graph] at hmn1
+  simp[graph] at hmn2
+  push_neg at hmn2
+  contradict hmn2
+  rw[← hmn1]
+  exact hy''.symm
+  simp[is_func_graph]
+  use x
+  by_contra h'
+  rcases h' with ⟨y' , hy', hy''⟩
+  have hy''' := hy'' (f x)
+  simp at hy'''
+  have h: (x, f x) ∈ graph f ∆ graph g  := by
+    define
+    left
+    constructor
+    rfl
+    define
+    rcases hmn with ⟨hmn1, hmn2⟩
+    simp[graph] at hmn1
+    simp[graph] at hmn2
+    push_neg
+    push_neg at hmn1
+    symm
+    rw[hmn2]
+    exact hmn1
+  have hy''' := hy''' h
+  have h': (x, g x) ∈ graph f ∆ graph g := by
+    define
+    right
+    constructor
+    rfl
+    rcases hmn with ⟨hmn1, hmn2⟩
+    simp[graph] at hmn1
+    simp[graph] at hmn2
+    simp[graph]
+    push_neg
+    push_neg at hmn1
+    rw[hmn2]
+    exact hmn1
+  have hy'' := hy'' (g x) h'
+  rw[←  hy'''] at hy''
+  rcases hmn with ⟨hmn1, hmn2⟩
+  simp[graph] at hmn1
+  simp[graph] at hmn2
+  push_neg at hmn1
+  contradict hmn1
+  rw[hmn2] at hy''
+  exact hy''.symm
+
+theorem Exercise_5_1_11 (A: Type):
+    ∃! (X: Set (A × A)), equiv_rel (RelFromExt X) ∧ is_func_graph X := by
+  let iA := { (x, y): A × A | x = y }
+  use iA
+  simp
+  constructor
+  constructor
+  constructor
+  rintro x
+  simp[RelFromExt]
+  rfl
+  constructor
+  rintro x y hxy
+  simp[RelFromExt] at hxy
+  simp[RelFromExt]
+  define
+  define at hxy
+  exact hxy.symm
+  rintro x y z hxy hyz
+  simp[RelFromExt] at hxy
+  simp[RelFromExt] at hyz
+  simp[RelFromExt]
+  define at hxy
+  define at hyz
+  define
+  rw[← hyz]
+  exact hxy
+  simp[is_func_graph]
+  rintro x
+  exists_unique
+  use x
+  define
+  rfl
+  rintro y z hy hz
+  define at hy
+  define at hz
+  rw[← hy]
+  exact hz
+  rintro Y hY hY'
+  apply Set.ext
+  rintro ⟨m ,n⟩
+  constructor
+  rintro hx
+  define
+  have h: (m ,m) ∈ Y := by
+    rcases hY with ⟨refl, _, _⟩
+    exact refl m
+  simp[is_func_graph] at hY'
+  rcases hY' m with ⟨u , _, hh⟩
+  have t := hh m h
+  have t' := hh n hx
+  rw[t']
+  exact t
+  rintro h
+  define at h
+  rw[h]
+  rcases hY with ⟨refl, _, _⟩
+  exact refl n
+
+theorem Exercise_5_1_12_a (U : Type) (A B C: Set U) (f g: Set (U × U))
+    (hf: ∀ x ∈ A, ∃! y ∈ C, (x, y) ∈ f)
+    (hg: ∀ x ∈ B, ∃! y ∈ C, (x, y) ∈ g)
+    (hf': ∀ x y: U, (x, y) ∈ f ↔ x ∈ A ∧ y ∈ C)
+    (hg': ∀ x y: U, (x, y) ∈ g ↔ x ∈ B ∧ y ∈ C)
+    (hAB: A ∩ B = ∅):
+    ∀ x ∈ A ∪ B, ∃! y ∈  C, (x, y) ∈ (f ∪ g) := by
+  rintro x (hx | hx)
+  rcases hf x hx with ⟨fx, ⟨h, h'⟩ , h''⟩
+  use fx
+  simp
+  constructor
+  constructor
+  exact h
+  left
+  exact h'
+  rintro y hy (hy' | hy')
+  apply h''
+  apply And.intro hy hy'
+  contradict hAB
+  push_neg
+  use x
+  constructor
+  apply ((hf' x fx).mp h').1
+  apply ((hg' x y).mp hy').1
+  rcases hg x hx with ⟨gx, ⟨h, h'⟩ , h''⟩
+  use gx
+  simp
+  constructor
+  constructor
+  exact h
+  right
+  exact h'
+  rintro y hy (hy' | hy')
+  contradict hAB
+  push_neg
+  use x
+  constructor
+  apply ((hf' x y).mp hy').1
+  apply ((hg' x gx).mp h').1
+  apply h''
+  constructor
+  exact hy
+  exact hy'
+
+theorem Exercise_5_1_12_b (U : Type) (A B C: Set U) (f g: Set (U × U))
+    (hf: ∀ x ∈ A, ∃! y ∈ C, (x, y) ∈ f)
+    (hg: ∀ x ∈ B, ∃! y ∈ C, (x, y) ∈ g)
+    (hf': ∀ x y: U, (x, y) ∈ f ↔ x ∈ A ∧ y ∈ C)
+    (hg': ∀ x y: U, (x, y) ∈ g ↔ x ∈ B ∧ y ∈ C):
+    (∀ x ∈ A ∪ B, ∃! y ∈  C, (x, y) ∈ (f ∪ g)) ↔ f ∩ ((A ∩ B) ×ˢ C) = g ∩ ((A ∩ B) ×ˢ C) := by
+  constructor
+  rintro h
+  apply Set.ext
+  rintro ⟨m , n⟩
+  constructor
+  rintro hmn
+  constructor
+  rcases hmn with ⟨hmn, ⟨ hmn1, hmn1'⟩ , hmn2⟩
+  have t: m ∈ A ∪ B := by
+    left
+    apply hmn1
+  rcases h m t with ⟨u, ⟨hu, hu1⟩ , hu'⟩
+  rcases hf m  hmn1 with ⟨p, ⟨hp, hp'⟩ , hp''⟩
+  rcases hg m  hmn1' with ⟨q, ⟨hq, hq'⟩ , hq''⟩
+  simp at hu'
+  have t': (m, p) ∈ f ∨ (m, p) ∈ g := by
+    left
+    exact hp'
+  have t'': (m, q) ∈ f ∨ (m, q) ∈ g := by
+    right
+    exact hq'
+  have t1 := hu' p hp t'
+  have t2 := hu' q hq t''
+  rcases hf m hmn1 with ⟨l, _, hl⟩
+  simp at hl
+  have hp := hl p hp hp'
+  have hn := hl n hmn2 hmn
+  rw[t2, ←t1, hp, ← hn] at hq'
+  exact hq'
+  exact hmn.2
+  rintro ⟨hmn, ⟨ hmn1, hmn1'⟩ , hmn2⟩
+  constructor
+  rcases hf m  hmn1 with ⟨p, ⟨hp, hp'⟩ , hp''⟩
+  have t: m ∈ A ∪ B := by
+    left
+    apply hmn1
+  rcases h m t with ⟨u, ⟨hu, hu1⟩ , hu'⟩
+  have t': (m, p) ∈ f ∨ (m, p) ∈ g := by
+    left
+    exact hp'
+  have t'': (m, n) ∈ f ∨ (m, n) ∈ g := by
+    right
+    exact hmn
+  simp at hu'
+  have t1 := hu' p hp t'
+  have t2 := hu' n hmn2 t''
+  rw[t2, ← t1]
+  exact hp'
+  constructor
+  constructor
+  exact hmn1
+  exact hmn1'
+  exact hmn2
+  rintro h x (hx | hx)
+  rcases hf x hx with ⟨u, ⟨hu, hu'⟩, hu2⟩
+  use u
+  simp
+  constructor
+  constructor
+  exact hu
+  left
+  exact hu'
+  rintro y hy (hy' | hy')
+  apply hu2
+  apply And.intro hy hy'
+  have t: (x, u ) ∈ f ∩ (A ∩ B) ×ˢ C := by
+    constructor
+    exact hu'
+    constructor
+    constructor
+    exact ((hf' x u).mp hu').1
+    exact ((hg' x y).mp hy').1
+    exact hu
+  rw[h] at t
+  rcases t with ⟨t, _⟩
+  rcases hg x ((hg' x y).mp hy').1 with ⟨w, hw, hw1⟩
+  simp at hw1
+  have bb := hw1 u hu t
+  have gg := hw1 y hy hy'
+  rw[← bb] at gg
+  exact gg
+  rcases hg x hx with ⟨u, ⟨hu, hu'⟩, hu2⟩
+  use u
+  simp
+  constructor
+  constructor
+  exact hu
+  right
+  exact hu'
+  rintro y hy (hy' | hy')
+  apply hu2
+  constructor
+  exact hy
+  have t: (x, y) ∈  f ∩ (A ∩ B) ×ˢ C := by
+    constructor
+    exact hy'
+    constructor
+    constructor
+    exact ((hf' x y).mp hy').1
+    exact ((hg' x u).mp hu').1
+    exact ((hf' x y).mp hy').2
+  rw[h] at t
+  exact t.1
+  rcases hg x ((hg' x u).mp hu').1 with ⟨l, _, hl'⟩
+  simp at hl'
+  have bb := hl' u hu hu'
+  have gg := hl' y hy hy'
+  rw[bb, gg]

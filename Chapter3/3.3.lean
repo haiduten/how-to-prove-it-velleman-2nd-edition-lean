@@ -10,6 +10,39 @@ theorem Exercise_3_3_1
   apply Exists.intro u h4
   done
 
+theorem Exercise_3_3_2 (U: Type) (A B C: Set U)
+    (h: A ∩ (B \ C) = ∅):
+    A ∩ B ⊆ C := by
+  rintro x  hx
+  by_cases h': x ∈ C
+  exact h'
+  contradict h
+  push_neg
+  use x
+  constructor
+  exact hx.1
+  constructor
+  exact hx.2
+  exact h'
+
+theorem Exercise_3_3_3 (U: Type) (A B C: Set U)
+    (h: A ⊆ B \ C):
+    A ∩ C = ∅:= by
+  by_contra h'
+  push_neg at h'
+  contradict h
+  rcases h' with ⟨u, hu, hu'⟩
+  define;
+  push_neg
+  use u
+  constructor
+  exact hu
+  define; demorgan
+  right
+  exact hu'
+
+
+
 theorem Exercise_3_3_8 (U : Type) (F : Set (Set U)) (A : Set U)
     (h1 : A ∈ F) : A ⊆ ⋃₀ F := by
   define

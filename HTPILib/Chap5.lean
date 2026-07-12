@@ -30,6 +30,13 @@ def closure2 {A : Type} (f : A → A → A) (B C : Set A) : Prop :=
 def closed_family {A : Type} (F : Set (A → A)) (C : Set A) : Prop :=
   ∀ f ∈ F, closed f C
 
+
+def closed_family2 {A : Type} (F : Set (A → A → A)) (C : Set A) : Prop :=
+  ∀ f ∈ F, closed2 f C
+
+def closure_family2 {A : Type} (F : Set (A → A → A)) (B C : Set A) : Prop :=
+  smallestElt (sub A) C {D : Set A | B ⊆ D ∧ closed_family2 F D}
+
 def closure_family {A : Type} (F : Set (A → A)) (B C : Set A) : Prop :=
   smallestElt (sub A) C {D : Set A | B ⊆ D ∧ closed_family F D}
 

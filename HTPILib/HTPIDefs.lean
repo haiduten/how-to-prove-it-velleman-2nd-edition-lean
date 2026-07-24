@@ -1142,6 +1142,7 @@ theorem sum_step {A : Type} [AddZeroClass A] {k n : Nat} {f : Nat → A}
   rfl
   done
 
+
 theorem sum_from_zero_step {A : Type} [AddZeroClass A] {n : Nat} {f : Nat → A} :
     Sum i from 0 to (n + 1), f i = (Sum i from 0 to n, f i) + f (n + 1) :=
   sum_step (Nat.zero_le n)
